@@ -22,9 +22,9 @@ function TechRow({ tech }: { tech: readonly string[] }) {
 /** Three items, three cells. One feature cell, two supporting cells. */
 export function Work() {
   return (
-    <section id="work" className="scroll-mt-20 border-t border-[var(--line)] bg-[var(--bg-2)] py-24 md:py-32">
+    <section className="border-t border-[var(--line)] bg-[var(--bg-2)] py-24 md:py-32">
       <Shell>
-        <SectionHeading>Selected work</SectionHeading>
+        <SectionHeading id="work">Selected work</SectionHeading>
 
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           <Reveal as="article" className="md:col-span-2">

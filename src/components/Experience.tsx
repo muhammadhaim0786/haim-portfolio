@@ -10,12 +10,12 @@ export function Experience() {
   const earlier = roles.slice(DETAILED);
 
   return (
-    <section id="experience" className="scroll-mt-20 py-24 md:py-32">
+    <section className="py-24 md:py-32">
       <Shell>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">
             <div className="lg:sticky lg:top-28">
-              <SectionHeading>Where I have worked</SectionHeading>
+              <SectionHeading id="experience">Where I have worked</SectionHeading>
               <p className="mt-5 max-w-[32ch] text-[14.5px] leading-relaxed text-[var(--fg-muted)]">
                 Five roles across healthcare, enterprise, government, gaming, and ERP delivery.
               </p>

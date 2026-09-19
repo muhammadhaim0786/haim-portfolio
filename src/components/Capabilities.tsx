@@ -27,9 +27,9 @@ const surfaces = [
 
 export function Capabilities() {
   return (
-    <section id="capabilities" className="scroll-mt-20 py-24 md:py-32">
+    <section className="py-24 md:py-32">
       <Shell>
-        <SectionHeading>What I bring</SectionHeading>
+        <SectionHeading id="capabilities">What I bring</SectionHeading>
         <p className="mt-5 max-w-[56ch] text-[15px] leading-relaxed text-[var(--fg-muted)]">
           Coverage is chosen by which layer owns the behavior, so suites stay fast and failures
           stay diagnostic.

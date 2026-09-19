@@ -13,7 +13,7 @@ export function SectionHeading({ id, children }: { id?: string; children: ReactN
   return (
     <h2
       id={id}
-      className="text-[clamp(1.75rem,3.4vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.03em] text-[var(--fg)]"
+      className="scroll-mt-28 text-[clamp(1.75rem,3.4vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.03em] text-[var(--fg)]"
     >
       {children}
     </h2>

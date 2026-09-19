@@ -7,8 +7,7 @@ import { Shell } from "./Primitives";
 export function Contact() {
   return (
     <section
-      id="contact"
-      className="scroll-mt-20 border-t border-[var(--line)] py-28 md:py-36"
+      className="border-t border-[var(--line)] py-28 md:py-36"
       style={{
         backgroundImage: "radial-gradient(60% 90% at 50% 100%, var(--accent-wash), transparent 70%)",
       }}
@@ -16,7 +15,7 @@ export function Contact() {
       <Shell>
         <Reveal>
           <div className="mx-auto max-w-[44rem] text-center">
-            <h2 className="text-[clamp(1.9rem,4.4vw,3rem)] font-medium leading-[1.06] tracking-[-0.035em] text-[var(--fg)]">
+            <h2 id="contact" className="scroll-mt-28 text-[clamp(1.9rem,4.4vw,3rem)] font-medium leading-[1.06] tracking-[-0.035em] text-[var(--fg)]">
               Hiring for release quality?
             </h2>
             <p className="mx-auto mt-6 max-w-[48ch] text-[15.5px] leading-relaxed text-[var(--fg-muted)]">
