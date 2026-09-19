@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   Tokens. One palette, two modes. Accent is locked to burnt orange
+   and is the only chromatic value used anywhere on the page.
+   --------------------------------------------------------------- */
+
+:root {
+  --bg: #0b0d10;
+  --bg-2: #101317;
+  --surface: #14181d;
+  --line: rgb(255 255 255 / 0.09);
+  --line-strong: rgb(255 255 255 / 0.17);
+  --fg: #e9ecf0;
+  --fg-muted: #9aa3ae;
+  --fg-dim: #7e8792;
+  --accent: #e2703a;
+  --accent-fg: #0b0d10;
+  --accent-wash: rgb(226 112 58 / 0.10);
+  --r: 2px;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f7f7f5;
+  --bg-2: #efefec;
+  --surface: #ffffff;
+  --line: rgb(10 12 15 / 0.11);
+  --line-strong: rgb(10 12 15 / 0.20);
+  --fg: #14171b;
+  --fg-muted: #565e69;
+  --fg-dim: #5e6774;
+  --accent: #b8461a;
+  --accent-fg: #ffffff;
+  --accent-wash: rgb(184 70 26 / 0.07);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-dim: var(--fg-dim);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-wash: var(--accent-wash);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-token: var(--r);
+}
+
+* { border-color: var(--line); }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r);
+}
+
+/* Toolchain marquee. Justification: the strip communicates breadth of
+   tooling at a glance; no single logo needs individual attention. */
+@keyframes rail {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.rail-track {
+  animation: rail 42s linear infinite;
+  will-change: transform;
+}
+
+.rail:hover .rail-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rail-track { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Horizontal scroll-snap row used by the working-method section. */
+.snap-row {
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.snap-row::-webkit-scrollbar { display: none; }
