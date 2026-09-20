@@ -62,7 +62,12 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
         setStatus("idle");
         return;
       }
-      setFormError(json.error || "Something went wrong. Please email directly.");
+      // Show the provider's own reason so a misconfiguration is diagnosable
+      // from the page itself rather than from the hosting dashboard.
+      const detail = json.providerMessage
+        ? ` (${json.providerStatus}: ${json.providerMessage})`
+        : "";
+      setFormError((json.error || "Something went wrong. Please email directly.") + detail);
       setStatus("error");
     } catch {
       setFormError("No connection. Please check your network, or email directly.");

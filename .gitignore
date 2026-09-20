@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Claude desktop app drops delivered files here
 /Claude outputs/
+
+.vercel
+.env*

@@ -34,8 +34,32 @@ function str(v: unknown, max: number) {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
-export async function POST(request: Request) {
+/**
+ * Diagnostic. Reports whether the credentials actually reached this deployment,
+ * without revealing them and without sending anything. Safe to delete once the
+ * form is confirmed working.
+ */
+export async function GET() {
   const endpoint = process.env.CONTACT_ENDPOINT;
+  const key = process.env.CONTACT_ACCESS_KEY;
+  let host: string | null = null;
+  try {
+    host = endpoint ? new URL(endpoint).host : null;
+  } catch {
+    host = "INVALID_URL";
+  }
+  return NextResponse.json({
+    endpointPresent: Boolean(endpoint),
+    endpointHost: host,
+    endpointHasWhitespace: endpoint ? endpoint !== endpoint.trim() : null,
+    accessKeyPresent: Boolean(key),
+    accessKeyLength: key ? key.trim().length : 0,
+    accessKeyHasWhitespace: key ? key !== key.trim() : null,
+  });
+}
+
+export async function POST(request: Request) {
+  const endpoint = process.env.CONTACT_ENDPOINT?.trim();
   if (!endpoint) {
     return NextResponse.json(
       { ok: false, error: "The contact form is not configured yet. Please email directly." },
@@ -80,7 +104,8 @@ export async function POST(request: Request) {
     subject: `Portfolio inquiry from ${name}${company ? ` (${company})` : ""}`,
     _replyto: email,
   };
-  if (process.env.CONTACT_ACCESS_KEY) payload.access_key = process.env.CONTACT_ACCESS_KEY;
+  const accessKey = process.env.CONTACT_ACCESS_KEY?.trim();
+  if (accessKey) payload.access_key = accessKey;
 
   try {
     const res = await fetch(endpoint, {
@@ -90,10 +115,32 @@ export async function POST(request: Request) {
       signal: AbortSignal.timeout(12000),
     });
 
-    if (!res.ok) {
-      console.error("inquiry relay rejected", res.status, await res.text().catch(() => ""));
+    const raw = await res.text().catch(() => "");
+    let providerMessage = "";
+    try {
+      providerMessage = String(JSON.parse(raw)?.message ?? "");
+    } catch {
+      providerMessage = raw.slice(0, 200);
+    }
+
+    // Some providers answer HTTP 200 with a failure body, so check both.
+    let providerOk = res.ok;
+    try {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.success === "boolean") providerOk = res.ok && parsed.success;
+    } catch {
+      /* non-JSON body: fall back to the HTTP status */
+    }
+
+    if (!providerOk) {
+      console.error("inquiry relay rejected", res.status, raw.slice(0, 500));
       return NextResponse.json(
-        { ok: false, error: "The message could not be delivered. Please email directly." },
+        {
+          ok: false,
+          error: "The message could not be delivered. Please email directly.",
+          providerStatus: res.status,
+          providerMessage,
+        },
         { status: 502 },
       );
     }
