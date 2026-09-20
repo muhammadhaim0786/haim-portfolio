@@ -17,9 +17,11 @@ import { NextResponse } from "next/server";
  */
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const MAX = { name: 100, email: 160, company: 120, message: 4000 } as const;
 const TOPICS = new Set(["fulltime", "automation", "process", "other"]);
+const TIMEOUT_MS = 15000;
 
 type Payload = {
   name?: unknown;
@@ -34,32 +36,89 @@ function str(v: unknown, max: number) {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
+function endpointUrl() {
+  return process.env.CONTACT_ENDPOINT?.trim();
+}
+
+function accessKey() {
+  return process.env.CONTACT_ACCESS_KEY?.trim();
+}
+
+/** Undici hides the real cause one level down. Surface it. */
+function describeError(err: unknown) {
+  const e = err as { name?: string; message?: string; cause?: { code?: string; message?: string } };
+  return {
+    errorName: e?.name ?? "Unknown",
+    errorMessage: (e?.message ?? "").slice(0, 200),
+    errorCode: e?.cause?.code ?? null,
+    errorCause: (e?.cause?.message ?? "").slice(0, 200) || null,
+  };
+}
+
 /**
- * Diagnostic. Reports whether the credentials actually reached this deployment,
- * without revealing them and without sending anything. Safe to delete once the
- * form is confirmed working.
+ * Diagnostic. Reports whether the credentials reached this deployment, without
+ * revealing them. With ?probe=1 it also opens a real connection to the provider
+ * using a deliberately invalid key, so the provider refuses it and NO message is
+ * ever delivered. That separates "cannot reach the provider" from "the provider
+ * rejected our request". Safe to delete once the form is confirmed working.
  */
-export async function GET() {
-  const endpoint = process.env.CONTACT_ENDPOINT;
-  const key = process.env.CONTACT_ACCESS_KEY;
+export async function GET(request: Request) {
+  const endpoint = endpointUrl();
+  const key = accessKey();
+
   let host: string | null = null;
   try {
     host = endpoint ? new URL(endpoint).host : null;
   } catch {
     host = "INVALID_URL";
   }
-  return NextResponse.json({
+
+  const config = {
     endpointPresent: Boolean(endpoint),
     endpointHost: host,
-    endpointHasWhitespace: endpoint ? endpoint !== endpoint.trim() : null,
     accessKeyPresent: Boolean(key),
-    accessKeyLength: key ? key.trim().length : 0,
-    accessKeyHasWhitespace: key ? key !== key.trim() : null,
-  });
+    accessKeyLength: key ? key.length : 0,
+    nodeVersion: process.version,
+  };
+
+  if (new URL(request.url).searchParams.get("probe") !== "1" || !endpoint) {
+    return NextResponse.json(config);
+  }
+
+  const started = Date.now();
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "User-Agent": "Mozilla/5.0 (compatible; portfolio-contact-form/1.0)",
+      },
+      // Intentionally invalid key: the provider refuses, nothing is delivered.
+      body: JSON.stringify({
+        access_key: "00000000-0000-0000-0000-000000000000",
+        name: "connectivity probe",
+        email: "probe@example.com",
+        message: "Connectivity probe. This should be refused, not delivered.",
+      }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+    const body = (await res.text().catch(() => "")).slice(0, 300);
+    return NextResponse.json({
+      ...config,
+      probe: { reached: true, status: res.status, ms: Date.now() - started, body },
+    });
+  } catch (err) {
+    return NextResponse.json({
+      ...config,
+      probe: { reached: false, ms: Date.now() - started, ...describeError(err) },
+    });
+  }
 }
 
 export async function POST(request: Request) {
-  const endpoint = process.env.CONTACT_ENDPOINT?.trim();
+  const endpoint = endpointUrl();
   if (!endpoint) {
     return NextResponse.json(
       { ok: false, error: "The contact form is not configured yet. Please email directly." },
@@ -102,34 +161,36 @@ export async function POST(request: Request) {
     message,
     topic: topic || "other",
     subject: `Portfolio inquiry from ${name}${company ? ` (${company})` : ""}`,
+    // Web3Forms spells this `replyto`; Formspree uses `_replyto`. Send both.
+    replyto: email,
     _replyto: email,
   };
-  const accessKey = process.env.CONTACT_ACCESS_KEY?.trim();
-  if (accessKey) payload.access_key = accessKey;
+  const key = accessKey();
+  if (key) payload.access_key = key;
 
   try {
     const res = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "User-Agent": "Mozilla/5.0 (compatible; portfolio-contact-form/1.0)",
+      },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
     });
 
     const raw = await res.text().catch(() => "");
     let providerMessage = "";
-    try {
-      providerMessage = String(JSON.parse(raw)?.message ?? "");
-    } catch {
-      providerMessage = raw.slice(0, 200);
-    }
-
-    // Some providers answer HTTP 200 with a failure body, so check both.
     let providerOk = res.ok;
     try {
       const parsed = JSON.parse(raw);
+      providerMessage = String(parsed?.message ?? "");
+      // Some providers answer HTTP 200 with a failure body, so check both.
       if (typeof parsed?.success === "boolean") providerOk = res.ok && parsed.success;
     } catch {
-      /* non-JSON body: fall back to the HTTP status */
+      providerMessage = raw.slice(0, 200);
     }
 
     if (!providerOk) {
@@ -146,9 +207,14 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("inquiry relay failed", err);
+    const detail = describeError(err);
+    console.error("inquiry relay failed", detail);
     return NextResponse.json(
-      { ok: false, error: "The message could not be delivered. Please email directly." },
+      {
+        ok: false,
+        error: "The message could not be delivered. Please email directly.",
+        ...detail,
+      },
       { status: 502 },
     );
   }
