@@ -8,6 +8,8 @@ export const person = {
   phoneHref: "+923326009541",
   linkedin: "https://www.linkedin.com/in/muhammad-haim-7203b11b3/",
   // Every visible sentence on this site maps to a line in the source CV.
+  cv: "/Muhammad-Haim-Quality-Engineer.pdf",
+  cvName: "Muhammad-Haim-Quality-Engineer.pdf",
   headline: "I find the defects your UI layer hides.",
   subline:
     "Quality Engineer with 4+ years building layered automation and cross-layer verification across healthcare, government, and enterprise systems.",
@@ -248,4 +250,51 @@ export const toolchain = [
   "siConfluence",
   "siGit",
   "siGithub",
+] as const;
+
+/**
+ * Engagement paths. Each one maps to something he has actually done, which is
+ * why there are three and not five.
+ */
+export const paths = [
+  {
+    id: "fulltime",
+    title: "Full-time quality engineering",
+    forWho: "Teams hiring a QA engineer who owns release quality, not just test execution.",
+    youGet:
+      "Test strategy, layered automation, cross-layer release verification, and a defect pipeline engineering actually uses.",
+    start: "Send the role, the stack, and what is currently breaking in your releases.",
+    reply: "Reply within 48 hours.",
+  },
+  {
+    id: "automation",
+    title: "Automation build or rescue",
+    forWho: "Teams with no suite, or a Playwright suite that is slow, flaky, and ignored.",
+    youGet:
+      "A Page Object Model framework built for reuse, wired into CI, with coverage assigned to the layer that owns each behavior.",
+    start: "Send the repo or a description of the current suite and where it hurts.",
+    reply: "Reply within 48 hours.",
+  },
+  {
+    id: "process",
+    title: "QA process setup",
+    forWho: "Product teams shipping without a formal QA function, where defects arrive from customers first.",
+    youGet:
+      "Test strategy, a coverage taxonomy, per-PR test plans, standardized defect intake, and a triage pipeline in your tracker.",
+    start: "Send how you ship today and where defects are currently getting caught.",
+    reply: "Reply within 48 hours.",
+  },
+] as const;
+
+export const inquiryTopics = [
+  { value: "fulltime", label: "Full-time role" },
+  { value: "automation", label: "Automation build or rescue" },
+  { value: "process", label: "QA process setup" },
+  { value: "other", label: "Something else" },
+] as const;
+
+export const bio = [
+  "I started in ERP implementation, moved into multi-platform functional testing, then into automation, and now spend most of my time on the layer that decides whether a release is actually safe to ship.",
+  "The thread through all of it is the same: a feature passing in the browser tells you very little. The interesting defects live in the API response, the stored record, the log line, and the third-party integration that quietly failed. That is where I look first.",
+  "Right now I am at Oasys, where I built the first formal QA process and own release quality across eight product domains in a healthcare product. Before that, automation work at Motive and AZM Development, including a Playwright framework for a Saudi government compliance platform.",
 ] as const;

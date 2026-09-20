@@ -1,18 +1,17 @@
-"use client";
-
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+import type { CSSProperties, ReactNode } from "react";
 
 /**
- * Scroll reveal. Justification: sequences a section so the eye lands on the
- * heading before the detail.
+ * Scroll reveal, CSS only.
  *
- * Deliberately not built on whileInView. The element renders VISIBLE on the
- * server and is only hidden on the client, before paint, when it starts below
- * the fold and motion is allowed. Once revealed it can never be hidden again,
- * so a resize, a rotation, a failed hydration or a disabled-JS visit can never
- * leave content invisible.
+ * Deliberately not IntersectionObserver. An observer fires on a sampling tick,
+ * so a fast fling, an End keypress or a programmatic jump can carry an element
+ * past the viewport between two ticks; the callback never runs and the content
+ * stays at opacity 0 permanently. This was reproducible.
+ *
+ * A view() timeline is computed from scroll position every frame instead of
+ * from events, so it cannot be skipped. Browsers without support fall through
+ * the @supports gate and render the content plainly, and the whole thing sits
+ * behind prefers-reduced-motion. There is no JavaScript and no client bundle.
  */
 export function Reveal({
   children,
@@ -21,55 +20,14 @@ export function Reveal({
   className = "",
 }: {
   children: ReactNode;
+  /** Stagger position. Kept as a number for call-site compatibility. */
   delay?: number;
   as?: "div" | "li" | "section" | "article";
   className?: string;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const [armed, setArmed] = useState(false);
-  const [shown, setShown] = useState(true);
-
-  useIsomorphicLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
-    setArmed(true);
-    setShown(false);
-  }, []);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !armed || shown) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.18, rootMargin: "0px 0px -6% 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [armed, shown]);
-
+  const step = Math.min(Math.round(delay / 0.05), 8);
   return (
-    <Tag
-      // @ts-expect-error one ref type across the four allowed tags
-      ref={ref}
-      className={className}
-      style={
-        armed
-          ? {
-              opacity: shown ? 1 : 0,
-              transform: shown ? "none" : "translate3d(0, 18px, 0)",
-              transition: `opacity 560ms cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 560ms cubic-bezier(0.16,1,0.3,1) ${delay}s`,
-              willChange: shown ? "auto" : "opacity, transform",
-            }
-          : undefined
-      }
-    >
+    <Tag className={`reveal ${className}`} style={{ "--i": step } as CSSProperties}>
       {children}
     </Tag>
   );
