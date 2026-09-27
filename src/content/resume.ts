@@ -305,8 +305,6 @@ export const paths = [
  * one ships. Add `href` (live URL or public repo) when available. `image` is an
  * illustrative cover (generated with Higgsfield), not a product screenshot;
  * download it into /public/builds and use a local path so it never expires.
- * Kiraman Katibeen is client work: confirm the client is fine with it being
- * listed before deploying, or delete the entry.
  */
 export const builds = [
   {
@@ -317,7 +315,8 @@ export const builds = [
     ai: "Gemini writes the scripts, edge-tts voices them, Pexels supplies the footage, moviepy renders the cut.",
     stack: ["Python", "Gemini API", "edge-tts", "moviepy", "Pexels API"],
     href: "",
-    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181900_e7f68373-1edd-4930-a13f-368e0caa22e7.png",
+    image:
+      "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181900_e7f68373-1edd-4930-a13f-368e0caa22e7.png",
   },
   {
     name: "Eightbridge Solutions",
@@ -327,27 +326,8 @@ export const builds = [
     ai: "Built with an AI agent team for development and QA, reviewed and hardened by hand.",
     stack: ["Supabase", "Resend", "Vercel", "Admin CMS"],
     href: "",
-    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181927_04d58235-9d30-4f84-9558-afb16506eac0.png",
-  },
-  {
-    name: "Kiraman Katibeen",
-    kind: "Mobile app, client work",
-    status: "In build",
-    what: "The Book of My Salah: a prayer logging and reflection app for iOS and Android, with prayer times and notifications. Built solo, full stack, from the client's brief to an engineering PRD.",
-    ai: "AI-assisted build, with every release checked the way I check production software.",
-    stack: ["Flutter", "Supabase", "iOS", "Android"],
-    href: "",
-    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181953_2ddb57d0-ddf0-435b-860d-7412922a5cca.png",
-  },
-  {
-    name: "GeoRun",
-    kind: "3D mobile game",
-    status: "In design",
-    what: "An endless runner where you pick any place on the globe and run its real streets and buildings.",
-    ai: "Production PRD and architecture drafted with AI; build planned in Flutter and Flame.",
-    stack: ["Flutter", "Flame", "3D", "Maps data"],
-    href: "",
-    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_182012_9d800f48-1d47-4daf-9e72-c7937282a6b9.png",
+    image:
+      "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181927_04d58235-9d30-4f84-9558-afb16506eac0.png",
   },
 ] as const;
 

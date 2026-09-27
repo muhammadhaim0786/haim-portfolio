@@ -33,7 +33,7 @@ function Cover({ b, big }: { b: Build; big: boolean }) {
   );
 }
 
-function BuildCard({ b, big = false }: { b: Build; big?: boolean }) {
+function BuildCard({ b, big = false, flip = false }: { b: Build; big?: boolean; flip?: boolean }) {
   const href = (b.href as string) || "";
   const Wrapper = href ? "a" : "div";
   return (
@@ -44,7 +44,7 @@ function BuildCard({ b, big = false }: { b: Build; big?: boolean }) {
       } ${href ? "hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--red)]" : ""}`}
     >
       {big ? null : <Cover b={b} big={false} />}
-      <div className={`flex flex-col ${big ? "p-2 sm:p-4" : "px-1 pb-1"}`}>
+      <div className={`flex flex-col ${big ? "p-2 sm:p-4" : "px-1 pb-1"} ${flip ? "md:order-2" : ""}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[12px] text-[var(--ink-3)]">{b.kind}</p>
           <Status status={b.status} />
@@ -81,11 +81,10 @@ function BuildCard({ b, big = false }: { b: Build; big?: boolean }) {
 }
 
 /**
- * The builder side. First project gets the wide cell, the rest share the row
- * below, so four items tile as 1 wide + 3 without an empty cell.
+ * The builder side. Each project is a full-width card; the cover alternates
+ * sides so two in a row do not repeat the same composition.
  */
 export function Builds() {
-  const [first, ...rest] = builds;
   return (
     <section
       id="builds"
@@ -110,13 +109,10 @@ export function Builds() {
           </div>
         </div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          <Reveal className="md:col-span-3">
-            <BuildCard b={first} big />
-          </Reveal>
-          {rest.map((b, i) => (
-            <Reveal key={b.name} delay={0.05 * (i + 1)}>
-              <BuildCard b={b} />
+        <div className="mt-14 grid gap-5">
+          {builds.map((b, i) => (
+            <Reveal key={b.name} delay={0.05 * i}>
+              <BuildCard b={b} big flip={i % 2 === 1} />
             </Reveal>
           ))}
         </div>
