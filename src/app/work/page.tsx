@@ -14,7 +14,8 @@ export default function WorkPage() {
   return (
     <>
       <PageHeader
-        title="What I built and what it changed"
+        title="What I built,"
+        accent="what it changed."
         lede="Three pieces of work with the detail a hiring manager actually asks about: what was wrong, what I built, and what moved as a result."
       />
       <Work />

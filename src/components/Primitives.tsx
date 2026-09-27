@@ -1,19 +1,26 @@
 import type { ReactNode } from "react";
 
 export function Shell({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-[1240px] px-5 sm:px-8 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-[1320px] px-5 sm:px-8 ${className}`}>{children}</div>;
 }
 
 /**
- * Section headings carry no eyebrow label. The section's position on the page
- * already says what it is, and a mono uppercase tag above every heading is the
- * fastest way to make a site look templated.
+ * Section headings are set in the expanded display face. No eyebrow label:
+ * the section's position on the page already says what it is.
  */
-export function SectionHeading({ id, children }: { id?: string; children: ReactNode }) {
+export function SectionHeading({
+  id,
+  children,
+  className = "",
+}: {
+  id?: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <h2
       id={id}
-      className="scroll-mt-28 text-[clamp(1.75rem,3.4vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.03em] text-[var(--fg)]"
+      className={`display scroll-mt-28 text-[clamp(2.2rem,5.6vw,4.6rem)] text-[var(--fg)] ${className}`}
     >
       {children}
     </h2>

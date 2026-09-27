@@ -7,6 +7,10 @@ export const person = {
   phone: "+92 332 6009541",
   phoneHref: "+923326009541",
   linkedin: "https://www.linkedin.com/in/muhammad-haim-7203b11b3/",
+  linkedinHandle: "muhammad-haim",
+  whatsapp:
+    "https://wa.me/923326009541?text=Hi%20Haim%2C%20I%20found%20your%20portfolio%20and%20would%20like%20to%20talk.",
+  available: "Open to QA roles and contracts",
   // Every visible sentence on this site maps to a line in the source CV.
   cv: "/Muhammad-Haim-Quality-Engineer.pdf",
   cvName: "Muhammad-Haim-Quality-Engineer.pdf",

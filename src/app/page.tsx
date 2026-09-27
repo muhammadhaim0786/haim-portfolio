@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero";
+import { Figures } from "@/components/Figures";
 import { Toolchain } from "@/components/Toolchain";
 import { WorkTeaser } from "@/components/WorkTeaser";
 import { Capabilities } from "@/components/Capabilities";
@@ -9,6 +10,7 @@ export default function Page() {
   return (
     <>
       <Hero />
+      <Figures />
       <Toolchain />
       <WorkTeaser />
       <Capabilities />

@@ -8,7 +8,7 @@ type Status = "idle" | "submitting" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message" | "topic", string>>;
 
 const field =
-  "w-full rounded-[var(--r)] border bg-[var(--bg)] px-3.5 py-2.5 text-[14.5px] text-[var(--fg)] transition-colors duration-200 placeholder:text-[var(--fg-dim)] focus:border-[var(--accent)] focus:outline-none";
+  "w-full rounded-[var(--r-input)] border bg-[var(--bg)] px-4 py-3 text-[15px] text-[var(--fg)] transition-[border-color,box-shadow] duration-200 placeholder:text-[var(--fg-dim)] focus:border-[var(--accent)] focus:shadow-[0_0_0_4px_rgb(198_243_94_/_0.12)] focus:outline-none";
 
 function Label({ htmlFor, children, optional }: { htmlFor: string; children: string; optional?: boolean }) {
   return (
@@ -22,7 +22,7 @@ function Label({ htmlFor, children, optional }: { htmlFor: string; children: str
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} className="flex items-start gap-1.5 text-[12.5px] text-[var(--accent)]">
+    <p id={id} className="flex items-start gap-1.5 text-[12.5px] text-[#ff8a7a]">
       <WarningCircleIcon size={14} weight="fill" className="mt-[1px] shrink-0" />
       {message}
     </p>
@@ -60,14 +60,13 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
       if (res.status === 422 && json.fields) {
         setErrors(json.fields as FieldErrors);
         setStatus("idle");
+        // Move focus to the first invalid field so keyboard and screen reader
+        // users land on the problem instead of hunting for it.
+        const first = ["topic", "name", "email", "message"].find((k) => k in json.fields);
+        if (first) requestAnimationFrame(() => document.getElementById(first)?.focus());
         return;
       }
-      // Show the provider's own reason so a misconfiguration is diagnosable
-      // from the page itself rather than from the hosting dashboard.
-      const detail = json.providerMessage
-        ? ` (${json.providerStatus}: ${json.providerMessage})`
-        : "";
-      setFormError((json.error || "Something went wrong. Please email directly.") + detail);
+      setFormError(json.error || "Something went wrong. Please email directly.");
       setStatus("error");
     } catch {
       setFormError("No connection. Please check your network, or email directly.");
@@ -77,9 +76,9 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
 
   if (status === "sent") {
     return (
-      <div className="rounded-[var(--r)] border border-[var(--line)] bg-[var(--bg-2)] p-8 text-center">
-        <CheckCircleIcon size={26} weight="regular" className="mx-auto text-[var(--accent)]" />
-        <p className="mt-4 text-[17px] font-medium text-[var(--fg)]">Message sent</p>
+      <div role="status" className="py-10 text-center">
+        <CheckCircleIcon size={40} weight="fill" className="mx-auto text-[var(--accent)]" />
+        <p className="display-soft mt-5 text-[1.8rem] text-[var(--fg)]">Message sent</p>
         <p className="mx-auto mt-2 max-w-[42ch] text-[14px] leading-relaxed text-[var(--fg-muted)]">
           It lands in my inbox directly. I reply to everything within 48 hours, including the ones
           that are not a fit.
@@ -134,7 +133,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
             className={`${field} disabled:opacity-60 ${
-              errors.name ? "border-[var(--accent)]" : "border-[var(--line-strong)]"
+              errors.name ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
             }`}
           />
           <FieldError id="name-error" message={errors.name} />
@@ -151,7 +150,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
             className={`${field} disabled:opacity-60 ${
-              errors.email ? "border-[var(--accent)]" : "border-[var(--line-strong)]"
+              errors.email ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
             }`}
           />
           <FieldError id="email-error" message={errors.email} />
@@ -182,7 +181,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "message-error" : "message-help"}
           className={`${field} resize-y disabled:opacity-60 ${
-            errors.message ? "border-[var(--accent)]" : "border-[var(--line-strong)]"
+            errors.message ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
           }`}
         />
         {errors.message ? (
@@ -197,9 +196,9 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
       {status === "error" ? (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-[var(--r)] border border-[var(--accent)] bg-[var(--accent-wash)] px-4 py-3"
+          className="flex items-start gap-2.5 rounded-[var(--r-input)] border border-[#ff8a7a]/60 bg-[#ff8a7a]/10 px-4 py-3"
         >
-          <WarningCircleIcon size={16} weight="fill" className="mt-[2px] shrink-0 text-[var(--accent)]" />
+          <WarningCircleIcon size={16} weight="fill" className="mt-[2px] shrink-0 text-[#ff8a7a]" />
           <p className="text-[13.5px] leading-relaxed text-[var(--fg)]">
             {formError}{" "}
             <a
@@ -216,9 +215,9 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[var(--r)] bg-[var(--accent)] px-6 text-[14px] font-medium text-[var(--accent-fg)] transition-[transform,opacity] duration-200 hover:opacity-90 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
+          className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {busy ? "Sending" : "Send inquiry"}
+          {busy ? "Sending..." : "Send message"}
           {busy ? null : <ArrowUpRightIcon size={14} weight="bold" />}
         </button>
         <p aria-live="polite" className="text-[12.5px] text-[var(--fg-dim)]">

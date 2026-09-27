@@ -19,6 +19,7 @@ export default function AboutPage() {
     <>
       <PageHeader
         title="About"
+        accent="me."
         lede="Quality Engineer, four and a half years in, currently owning release quality for a healthcare product across eight domains."
       />
 
@@ -34,10 +35,10 @@ export default function AboutPage() {
                   height={400}
                   quality={90}
                   priority
-                  className="w-full max-w-[380px] rounded-[var(--r)] border border-[var(--line)] object-cover"
+                  className="w-full max-w-[380px] rounded-[var(--r-card)] border border-[var(--line-strong)] object-cover shadow-[0_30px_80px_-30px_rgb(128_160_44_/_0.6)]"
                 />
                 <figcaption className="mt-5 grid gap-1">
-                  <span className="text-[15px] font-medium text-[var(--fg)]">{person.name}</span>
+                  <span className="display-soft text-[1.3rem] text-[var(--fg)]">{person.name}</span>
                   <span className="text-[13.5px] text-[var(--fg-muted)]">{person.role}</span>
                   <span className="font-mono text-[11.5px] text-[var(--fg-dim)]">
                     {person.location}
@@ -49,7 +50,7 @@ export default function AboutPage() {
             <div className="lg:col-span-7">
               {bio.map((para, i) => (
                 <Reveal key={para} delay={i * 0.05}>
-                  <p className="mb-6 max-w-[62ch] text-[16px] leading-[1.75] text-[var(--fg-muted)] first:text-[var(--fg)]">
+                  <p className="mb-6 max-w-[62ch] text-[17px] leading-[1.75] text-[var(--fg-muted)] first:text-[var(--fg)] first:text-[1.35rem] first:leading-[1.5]">
                     {para}
                   </p>
                 </Reveal>

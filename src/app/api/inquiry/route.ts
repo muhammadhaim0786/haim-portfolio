@@ -1,27 +1,49 @@
 import { NextResponse } from "next/server";
+import { inquiryTopics, person } from "@/content/resume";
 
 /**
- * Inquiry relay.
+ * Inquiry relay, sent through Resend (https://resend.com).
  *
- * The provider credential is read server side only, so it never reaches the
- * browser bundle. Works with any endpoint that accepts a JSON POST and answers
- * JSON, which covers both Formspree and Web3Forms:
+ *   RESEND_API_KEY=re_xxxxxxxx            required
+ *   CONTACT_TO_EMAIL=you@gmail.com         optional, defaults to person.email
+ *   CONTACT_FROM_EMAIL=Portfolio <hello@yourdomain.com>
+ *                                          optional, defaults to onboarding@resend.dev
  *
- *   CONTACT_ENDPOINT=https://formspree.io/f/xxxxxxx
- * or
- *   CONTACT_ENDPOINT=https://api.web3forms.com/submit
- *   CONTACT_ACCESS_KEY=<your web3forms access key>
+ * With the default sender (no verified domain) Resend only delivers to the
+ * email address the Resend account was created with, so sign up to Resend
+ * with the same inbox you want messages in.
  *
- * With neither set the route answers 503 and the contact page renders the
- * direct email details instead of a form, so nothing ever fakes a success.
+ * The key is read server side only. Without it the route answers 503 and the
+ * contact page shows direct email, WhatsApp and LinkedIn instead of a form.
  */
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX = { name: 100, email: 160, company: 120, message: 4000 } as const;
-const TOPICS = new Set(["fulltime", "automation", "process", "other"]);
+// Single source of truth: the same list drives the form's dropdown.
+const TOPICS: Record<string, string> = Object.fromEntries(
+  inquiryTopics.map((t) => [t.value, t.label]),
+);
 const TIMEOUT_MS = 15000;
+const DEFAULT_TO = person.email;
+const DEFAULT_FROM = "Portfolio Inquiry <onboarding@resend.dev>";
+
+/* Best-effort per-instance rate limit: 8 submissions per IP per 10 minutes.
+   Serverless instances do not share memory, so this slows a single abuser
+   down rather than guaranteeing a global cap. */
+const WINDOW_MS = 10 * 60 * 1000;
+const LIMIT = 8;
+const hits = new Map<string, number[]>();
+
+function limited(ip: string) {
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) hits.clear();
+  return recent.length > LIMIT;
+}
 
 type Payload = {
   name?: unknown;
@@ -36,93 +58,34 @@ function str(v: unknown, max: number) {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
-function endpointUrl() {
-  return process.env.CONTACT_ENDPOINT?.trim();
+function esc(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
-function accessKey() {
-  return process.env.CONTACT_ACCESS_KEY?.trim();
-}
-
-/** Undici hides the real cause one level down. Surface it. */
-function describeError(err: unknown) {
-  const e = err as { name?: string; message?: string; cause?: { code?: string; message?: string } };
-  return {
-    errorName: e?.name ?? "Unknown",
-    errorMessage: (e?.message ?? "").slice(0, 200),
-    errorCode: e?.cause?.code ?? null,
-    errorCause: (e?.cause?.message ?? "").slice(0, 200) || null,
-  };
-}
-
-/**
- * Diagnostic. Reports whether the credentials reached this deployment, without
- * revealing them. With ?probe=1 it also opens a real connection to the provider
- * using a deliberately invalid key, so the provider refuses it and NO message is
- * ever delivered. That separates "cannot reach the provider" from "the provider
- * rejected our request". Safe to delete once the form is confirmed working.
- */
-export async function GET(request: Request) {
-  const endpoint = endpointUrl();
-  const key = accessKey();
-
-  let host: string | null = null;
-  try {
-    host = endpoint ? new URL(endpoint).host : null;
-  } catch {
-    host = "INVALID_URL";
-  }
-
-  const config = {
-    endpointPresent: Boolean(endpoint),
-    endpointHost: host,
-    accessKeyPresent: Boolean(key),
-    accessKeyLength: key ? key.length : 0,
-    nodeVersion: process.version,
-  };
-
-  if (new URL(request.url).searchParams.get("probe") !== "1" || !endpoint) {
-    return NextResponse.json(config);
-  }
-
-  const started = Date.now();
-  try {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "User-Agent": "Mozilla/5.0 (compatible; portfolio-contact-form/1.0)",
-      },
-      // Intentionally invalid key: the provider refuses, nothing is delivered.
-      body: JSON.stringify({
-        access_key: "00000000-0000-0000-0000-000000000000",
-        name: "connectivity probe",
-        email: "probe@example.com",
-        message: "Connectivity probe. This should be refused, not delivered.",
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      cache: "no-store",
-    });
-    const body = (await res.text().catch(() => "")).slice(0, 300);
-    return NextResponse.json({
-      ...config,
-      probe: { reached: true, status: res.status, ms: Date.now() - started, body },
-    });
-  } catch (err) {
-    return NextResponse.json({
-      ...config,
-      probe: { reached: false, ms: Date.now() - started, ...describeError(err) },
-    });
-  }
+/** Strip CR/LF so nothing a visitor types can inject extra email headers. */
+function oneLine(s: string) {
+  return s.replace(/[\r\n]+/g, " ");
 }
 
 export async function POST(request: Request) {
-  const endpoint = endpointUrl();
-  if (!endpoint) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) {
     return NextResponse.json(
-      { ok: false, error: "The contact form is not configured yet. Please email directly." },
+      { ok: false, error: "The contact form is not configured yet. Please email or WhatsApp directly." },
       { status: 503 },
+    );
+  }
+
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (limited(ip)) {
+    return NextResponse.json(
+      { ok: false, error: "Too many messages from this connection. Please try again in a few minutes." },
+      { status: 429 },
     );
   }
 
@@ -138,83 +101,75 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const name = str(body.name, MAX.name);
-  const email = str(body.email, MAX.email);
-  const company = str(body.company, MAX.company);
+  const name = oneLine(str(body.name, MAX.name));
+  const email = oneLine(str(body.email, MAX.email));
+  const company = oneLine(str(body.company, MAX.company));
   const message = str(body.message, MAX.message);
-  const topic = str(body.topic, 40);
+  const topic = str(body.topic, 40) || "other";
 
   const fields: Record<string, string> = {};
   if (name.length < 2) fields.name = "Please enter your name.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) fields.email = "Please enter a valid email address.";
-  if (message.length < 20) fields.message = "Please give at least a sentence or two of context.";
-  if (topic && !TOPICS.has(topic)) fields.topic = "Please choose one of the listed options.";
+  if (message.length < 20) fields.message = "Please write at least a sentence or two (20+ characters).";
+  if (!(topic in TOPICS)) fields.topic = "Please choose one of the listed options.";
 
   if (Object.keys(fields).length > 0) {
     return NextResponse.json({ ok: false, fields }, { status: 422 });
   }
 
-  const payload: Record<string, string> = {
-    name,
-    email,
-    company: company || "Not given",
+  const to = process.env.CONTACT_TO_EMAIL?.trim() || DEFAULT_TO;
+  const from = process.env.CONTACT_FROM_EMAIL?.trim() || DEFAULT_FROM;
+  const topicLabel = TOPICS[topic];
+  const subject = `New inquiry: ${topicLabel} from ${name}${company ? ` (${company})` : ""}`;
+
+  const text = [
+    `Topic: ${topicLabel}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Company: ${company || "Not given"}`,
+    "",
     message,
-    topic: topic || "other",
-    subject: `Portfolio inquiry from ${name}${company ? ` (${company})` : ""}`,
-    // Web3Forms spells this `replyto`; Formspree uses `_replyto`. Send both.
-    replyto: email,
-    _replyto: email,
-  };
-  const key = accessKey();
-  if (key) payload.access_key = key;
+    "",
+    "Reply to this email to answer them directly.",
+  ].join("\n");
+
+  const html = `
+  <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111">
+    <p style="margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.08em">${esc(topicLabel)}</p>
+    <h2 style="margin:0 0 20px;font-size:20px">New inquiry from ${esc(name)}</h2>
+    <table style="font-size:14px;border-collapse:collapse;margin-bottom:20px">
+      <tr><td style="padding:4px 16px 4px 0;color:#666">Email</td><td><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#666">Company</td><td>${esc(company || "Not given")}</td></tr>
+    </table>
+    <div style="font-size:15px;line-height:1.6;white-space:pre-wrap;border-left:3px solid #a3e635;padding-left:14px">${esc(message)}</div>
+    <p style="margin-top:28px;font-size:12px;color:#888">Hit reply to answer ${esc(name)} directly.</p>
+  </div>`;
 
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        Accept: "application/json",
-        "User-Agent": "Mozilla/5.0 (compatible; portfolio-contact-form/1.0)",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ from, to: [to], reply_to: email, subject, text, html }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
       cache: "no-store",
     });
 
-    const raw = await res.text().catch(() => "");
-    let providerMessage = "";
-    let providerOk = res.ok;
-    try {
-      const parsed = JSON.parse(raw);
-      providerMessage = String(parsed?.message ?? "");
-      // Some providers answer HTTP 200 with a failure body, so check both.
-      if (typeof parsed?.success === "boolean") providerOk = res.ok && parsed.success;
-    } catch {
-      providerMessage = raw.slice(0, 200);
-    }
-
-    if (!providerOk) {
-      console.error("inquiry relay rejected", res.status, raw.slice(0, 500));
+    if (!res.ok) {
+      // Details go to the server log only; visitors get a clean message.
+      console.error("resend rejected", res.status, (await res.text().catch(() => "")).slice(0, 500));
       return NextResponse.json(
-        {
-          ok: false,
-          error: "The message could not be delivered. Please email directly.",
-          providerStatus: res.status,
-          providerMessage,
-        },
+        { ok: false, error: "The message could not be delivered. Please email or WhatsApp directly." },
         { status: 502 },
       );
     }
     return NextResponse.json({ ok: true });
   } catch (err) {
-    const detail = describeError(err);
-    console.error("inquiry relay failed", detail);
+    console.error("resend request failed", err);
     return NextResponse.json(
-      {
-        ok: false,
-        error: "The message could not be delivered. Please email directly.",
-        ...detail,
-      },
+      { ok: false, error: "The message could not be delivered. Please email or WhatsApp directly." },
       { status: 502 },
     );
   }

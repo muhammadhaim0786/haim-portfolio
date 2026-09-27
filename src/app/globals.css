@@ -1,39 +1,30 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------
-   Tokens. One palette, two modes. Accent is locked to burnt orange
-   and is the only chromatic value used anywhere on the page.
+   Tokens. One dark theme, one accent (acid lime), one olive glow.
+   Shape rule: buttons and chips are full pills, cards are --r-card,
+   inputs are --r-input. Nothing else gets a radius.
    --------------------------------------------------------------- */
 
 :root {
-  --bg: #0b0d10;
-  --bg-2: #101317;
-  --surface: #14181d;
-  --line: rgb(255 255 255 / 0.09);
-  --line-strong: rgb(255 255 255 / 0.17);
-  --fg: #e9ecf0;
-  --fg-muted: #9aa3ae;
-  --fg-dim: #7e8792;
-  --accent: #e2703a;
-  --accent-fg: #0b0d10;
-  --accent-wash: rgb(226 112 58 / 0.10);
-  --r: 2px;
+  --bg: #070807;
+  --bg-2: #0c0e0b;
+  --surface: #11140f;
+  --surface-2: #171b14;
+  --line: rgb(236 244 220 / 0.08);
+  --line-strong: rgb(236 244 220 / 0.16);
+  --fg: #eef1e8;
+  --fg-muted: #a6ab9e;
+  --fg-dim: #858b7c;
+  --accent: #c6f35e;
+  --accent-fg: #0b0d07;
+  --accent-wash: rgb(198 243 94 / 0.09);
+  --glow: rgb(128 160 44 / 0.42);
+  --r-card: 22px;
+  --r-input: 14px;
+  /* kept for older call sites */
+  --r: 14px;
   color-scheme: dark;
-}
-
-:root[data-theme="light"] {
-  --bg: #f7f7f5;
-  --bg-2: #efefec;
-  --surface: #ffffff;
-  --line: rgb(10 12 15 / 0.11);
-  --line-strong: rgb(10 12 15 / 0.20);
-  --fg: #14171b;
-  --fg-muted: #565e69;
-  --fg-dim: #5e6774;
-  --accent: #b8461a;
-  --accent-fg: #ffffff;
-  --accent-wash: rgb(184 70 26 / 0.07);
-  color-scheme: light;
 }
 
 @theme inline {
@@ -41,16 +32,14 @@
   --color-bg-2: var(--bg-2);
   --color-surface: var(--surface);
   --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-dim: var(--fg-dim);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
-  --color-accent-wash: var(--accent-wash);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --radius-token: var(--r);
+  --font-display: var(--font-display);
 }
 
 * { border-color: var(--line); }
@@ -58,14 +47,15 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  background: var(--bg);
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -76,38 +66,183 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: var(--r);
+  border-radius: 6px;
 }
 
-/* Toolchain marquee. Justification: the strip communicates breadth of
-   tooling at a glance; no single logo needs individual attention. */
+/* ---------- Display type ---------- */
+
+.display {
+  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.88;
+}
+
+.display-soft {
+  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+/* Soft luminous edge on the hero headline only. */
+.glow-text {
+  text-shadow: 0 0 42px rgb(198 243 94 / 0.16), 0 0 2px rgb(255 255 255 / 0.1);
+}
+
+.stroke-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(238 241 232 / 0.62);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  height: 3rem;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s, color 0.25s,
+    border-color 0.25s, box-shadow 0.35s;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  box-shadow: 0 0 0 0 rgb(198 243 94 / 0);
+}
+.btn-primary:hover {
+  box-shadow: 0 10px 40px -8px rgb(198 243 94 / 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+  background: rgb(255 255 255 / 0.02);
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+  transition: border-color 0.25s, color 0.25s, background-color 0.25s, transform 0.35s;
+}
+.icon-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+/* ---------- Surfaces ---------- */
+
+.card {
+  border-radius: var(--r-card);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+/* Spotlight border: a lime highlight that follows the pointer. The
+   position is written to --mx/--my by SpotlightCard; no React state. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, -40%),
+    rgb(198 243 94 / 0.55),
+    transparent 60%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -40%), rgb(198 243 94 / 0.06), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+.spotlight:hover::before,
+.spotlight:hover::after { opacity: 1; }
+
+/* Film grain. Fixed, non-interactive, never on a scrolling container. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- Toolchain marquee (the only marquee on the site) ---------- */
+
 @keyframes rail {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(-50%, 0, 0); }
 }
-
 .rail-track {
-  animation: rail 42s linear infinite;
+  animation: rail 40s linear infinite;
   will-change: transform;
 }
-
 .rail:hover .rail-track { animation-play-state: paused; }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .rail-track { animation: none; }
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-}
+/* ---------- WhatsApp pulse (real semantic state: a live chat channel) ---------- */
 
-/* Scroll reveal. Driven by scroll position, not by observer callbacks, so no
-   element can be skipped by a fast scroll and left invisible. Unsupported
-   browsers simply render the content. */
+@keyframes ping-soft {
+  0% { transform: scale(1); opacity: 0.55; }
+  80%, 100% { transform: scale(1.7); opacity: 0; }
+}
+.ping { animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* ---------- Scroll-driven reveal ---------- */
+
 @keyframes reveal-in {
-  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -116,8 +251,18 @@ body {
     .reveal {
       animation: reveal-in linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover calc(16% + var(--i, 0) * 3%);
+      animation-range: entry 0% cover calc(18% + var(--i, 0) * 3%);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rail-track, .ping { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }
 

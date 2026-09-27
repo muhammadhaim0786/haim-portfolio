@@ -28,11 +28,11 @@ export function Experience() {
                 <Reveal as="li" key={role.company} delay={i * 0.04}>
                   <article className="border-t border-[var(--line)] py-10 first:border-t-0 first:pt-0">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                      <h3 className="text-[1.35rem] font-medium tracking-[-0.025em] text-[var(--fg)]">
+                      <h3 className="display-soft text-[1.8rem] text-[var(--fg)]">
                         {role.company}
                         {role.current ? (
-                          <span className="ml-2.5 align-middle font-mono text-[10.5px] font-normal text-[var(--accent)]">
-                            NOW
+                          <span className="chip ml-3 !border-[var(--accent)] align-middle !text-[10.5px] !text-[var(--accent)]">
+                            Now
                           </span>
                         ) : null}
                       </h3>
@@ -49,7 +49,7 @@ export function Experience() {
                       {role.summary}
                     </p>
 
-                    <ul className="mt-6 grid gap-3.5 border-l border-[var(--line)] pl-5">
+                    <ul className="mt-6 grid gap-3.5 border-l-2 border-[var(--accent)]/40 pl-5">
                       {role.points.map((p) => (
                         <li
                           key={p}
@@ -64,7 +64,7 @@ export function Experience() {
                       {role.stack.map((s) => (
                         <li
                           key={s}
-                          className="rounded-[var(--r)] border border-[var(--line)] px-2 py-1 font-mono text-[11px] text-[var(--fg-dim)]"
+                          className="chip"
                         >
                           {s}
                         </li>
@@ -76,7 +76,7 @@ export function Experience() {
             </ol>
 
             <Reveal>
-              <div className="mt-10 rounded-[var(--r)] border border-[var(--line)] bg-[var(--bg-2)] p-6 sm:p-7">
+              <div className="card mt-10 p-6 sm:p-8">
                 <p className="font-mono text-[11.5px] text-[var(--fg-dim)]">Earlier</p>
                 <ol className="mt-4 grid gap-5">
                   {earlier.map((role) => (
