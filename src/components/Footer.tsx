@@ -1,4 +1,10 @@
 import Link from "next/link";
+import {
+  DownloadSimpleIcon,
+  EnvelopeSimpleIcon,
+  LinkedinLogoIcon,
+  WhatsappLogoIcon,
+} from "@phosphor-icons/react/dist/ssr";
 import { person } from "@/content/resume";
 import { Shell } from "./Primitives";
 
@@ -12,58 +18,55 @@ const pages = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--line)] py-12">
-      <Shell className="grid gap-8 sm:grid-cols-2 sm:items-start">
-        <div>
-          <p className="font-mono text-[13px] text-[var(--fg)]">
-            {person.name}
-            <span className="text-[var(--accent)]">.</span>
+    <footer className="border-t border-[var(--rule)] bg-[var(--paper-2)] py-14 pb-28 sm:pb-14">
+      <Shell className="grid gap-10 md:grid-cols-12">
+        <div className="md:col-span-6">
+          <p className="title text-[22px] text-[var(--ink)]">{person.name}</p>
+          <p className="mt-2 max-w-[38ch] text-[14.5px] leading-relaxed text-[var(--ink-2)]">
+            {person.discipline}. Based in {person.location}, working with teams anywhere.
           </p>
-          <p className="mt-2 max-w-[34ch] text-[13px] leading-relaxed text-[var(--fg-muted)]">
-            {person.discipline}
-          </p>
-          <p className="mt-3 font-mono text-[11.5px] text-[var(--fg-dim)]">{person.location}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 sm:justify-items-end">
-          <nav aria-label="Footer pages" className="grid content-start gap-2.5">
-            <p className="font-mono text-[11px] text-[var(--fg-dim)]">Pages</p>
-            {pages.map((p) => (
-              <Link
-                key={p.href}
-                href={p.href}
-                className="text-[13.5px] text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
-              >
-                {p.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="grid content-start gap-2.5">
-            <p className="font-mono text-[11px] text-[var(--fg-dim)]">Elsewhere</p>
+          <div className="mt-6 flex gap-2">
+            <a
+              href={person.whatsapp}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="WhatsApp"
+              className="icon-btn"
+            >
+              <WhatsappLogoIcon size={18} />
+            </a>
             <a
               href={person.linkedin}
               target="_blank"
               rel="noreferrer noopener"
-              className="text-[13.5px] text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
+              aria-label="LinkedIn"
+              className="icon-btn"
             >
-              LinkedIn
+              <LinkedinLogoIcon size={18} />
             </a>
-            <a
-              href={`mailto:${person.email}`}
-              className="text-[13.5px] text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
-            >
-              Email
+            <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn">
+              <EnvelopeSimpleIcon size={18} />
             </a>
-            <a
-              href={person.cv}
-              download={person.cvName}
-              className="text-[13.5px] text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
-            >
-              CV
+            <a href={person.cv} download={person.cvName} aria-label="Download CV" className="icon-btn">
+              <DownloadSimpleIcon size={18} />
             </a>
           </div>
         </div>
+
+        <nav
+          aria-label="Footer pages"
+          className="flex flex-wrap gap-x-7 gap-y-3 md:col-span-6 md:justify-end md:self-end"
+        >
+          {pages.map((p) => (
+            <Link
+              key={p.href}
+              href={p.href}
+              className="redlink text-[14px] text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              {p.label}
+            </Link>
+          ))}
+        </nav>
       </Shell>
     </footer>
   );

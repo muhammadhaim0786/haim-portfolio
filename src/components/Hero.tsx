@@ -1,118 +1,145 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
-import { ArrowUpRightIcon, LinkedinLogoIcon } from "@phosphor-icons/react/dist/ssr";
-import { figures, person } from "@/content/resume";
-import { Shell } from "./Primitives";
+import Link from "next/link";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import {
+  DownloadSimpleIcon,
+  EnvelopeSimpleIcon,
+  LinkedinLogoIcon,
+  WhatsappLogoIcon,
+} from "@phosphor-icons/react/dist/ssr";
+import { person } from "@/content/resume";
+import { Mark } from "./Mark";
+
+const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
- * Asymmetric split hero. Left carries the claim, right carries the person and
- * the evidence in one bordered panel. Entry motion is a single staggered rise:
- * it establishes reading order, then stops. Nothing here loops.
+ * Split hero. Left: the claim, typeset plainly, then marked up by the
+ * reviewer in sequence (circle, underline, margin note). Right: the person,
+ * presented as the exhibit, stamped. Motion tells the story once and stops.
  */
 export function Hero() {
   const reduce = useReducedMotion();
-
-  const rise = (i: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 20 },
+  // Depth on scroll: paper lines drift slower than the page, the photo a
+  // little faster, the copy stays put. Transform only, off under reduced motion.
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const linesY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 140]);
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -90]);
+  const photoR = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -3]);
+  const rise = (d: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.7, delay: 0.06 * i, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.7, delay: d, ease },
   });
 
   return (
-    <section id="top" className="relative overflow-hidden">
-      {/* Accent wash, behind content, never on a scrolling container. */}
-      <div
+    <section ref={ref} id="top" className="relative isolate overflow-hidden">
+      <motion.div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[70vh] opacity-70"
-        style={{
-          background: "radial-gradient(70% 55% at 78% 18%, var(--accent-wash), transparent 70%)",
-        }}
+        style={{ y: linesY }}
+        className="ruled absolute -bottom-40 -top-4 inset-x-0 -z-10 opacity-70"
       />
 
-      <Shell className="relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center pb-24 pt-12 md:pb-32 md:pt-16">
-        <div className="grid items-center gap-x-12 gap-y-12 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <motion.h1
-              {...rise(0)}
-              className="max-w-[16ch] text-[clamp(2.3rem,6.2vw,4.25rem)] font-medium leading-[1.03] tracking-[-0.035em] text-[var(--fg)]"
-            >
-              I find the defects your{" "}
-              <span className="text-[var(--accent)]">UI layer</span> hides.
-            </motion.h1>
-
-            <motion.p
-              {...rise(1)}
-              className="mt-7 max-w-[52ch] text-[15.5px] leading-relaxed text-[var(--fg-muted)] sm:text-base"
-            >
-              {person.subline}
-            </motion.p>
-
-            <motion.div {...rise(2)} className="mt-9 flex flex-wrap items-center gap-3">
-              <a
-                href="#contact"
-                className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[var(--r)] bg-[var(--accent)] px-5 text-[14px] font-medium text-[var(--accent-fg)] transition-[transform,opacity] duration-200 hover:opacity-90 active:translate-y-px"
-              >
-                Get in touch
-                <ArrowUpRightIcon size={14} weight="bold" />
-              </a>
-              <a
-                href={person.linkedin}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[var(--r)] border border-[var(--line-strong)] px-5 text-[14px] font-medium text-[var(--fg)] transition-colors duration-200 hover:bg-[var(--bg-2)] active:translate-y-px"
-              >
-                <LinkedinLogoIcon size={15} weight="regular" />
-                LinkedIn
-              </a>
-            </motion.div>
-          </div>
-
-          <motion.div
-            {...rise(3)}
-            className="overflow-hidden rounded-[var(--r)] border border-[var(--line)] lg:col-span-5"
+      <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-12 lg:py-16">
+        <div className="lg:col-span-8">
+          <motion.h1
+            initial={reduce ? false : { y: 14 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.7, ease }}
+            className="display max-w-[17ch] text-[clamp(2.6rem,5.4vw,5.1rem)] text-[var(--ink)]"
           >
-            <div className="flex items-center gap-4 border-b border-[var(--line)] p-5 sm:p-6">
+            Every release has a{" "}
+            <Mark kind="circle" delay={0.55}>
+              bug.
+            </Mark>{" "}
+            I find it{" "}
+            <Mark kind="underline" delay={1.35}>
+              before your users
+            </Mark>{" "}
+            do.
+          </motion.h1>
+
+          <motion.p {...rise(1.9)} className="note mt-5 flex items-center gap-2 text-[12.5px]">
+            <span aria-hidden className="h-px w-8 bg-[var(--red)]" />
+            UI, API, database, logs. Defects get checked where the truth lives.
+          </motion.p>
+
+          <motion.p
+            {...rise(0.15)}
+            className="mt-9 max-w-[50ch] text-[17px] leading-relaxed text-[var(--ink-2)]"
+          >
+            {person.subline}
+          </motion.p>
+
+          <motion.div {...rise(0.25)} className="mt-9 flex flex-wrap items-center gap-3">
+            <Link href="/contact" className="btn btn-ink">
+              Get in touch
+            </Link>
+            <a href={person.cv} download={person.cvName} className="btn btn-line">
+              <DownloadSimpleIcon size={16} />
+              Download CV
+            </a>
+            <span aria-hidden className="mx-1 hidden h-6 w-px bg-[var(--rule-strong)] sm:block" />
+            <a
+              href={person.whatsapp}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="WhatsApp"
+              className="icon-btn"
+            >
+              <WhatsappLogoIcon size={19} />
+            </a>
+            <a
+              href={person.linkedin}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="LinkedIn"
+              className="icon-btn"
+            >
+              <LinkedinLogoIcon size={19} />
+            </a>
+            <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn">
+              <EnvelopeSimpleIcon size={19} />
+            </a>
+          </motion.div>
+        </div>
+
+        <motion.div
+          style={{ y: photoY, rotate: photoR }}
+          className="relative mx-auto w-full max-w-[340px] lg:col-span-4 lg:mx-0 lg:justify-self-end"
+        >
+          <motion.figure {...rise(0.35)} className="relative">
+            <div className="sheet rotate-[1.5deg] p-3 pb-4 shadow-[0_30px_60px_-35px_rgb(19_21_24_/_0.45)] transition-transform duration-500 hover:rotate-0">
               <Image
                 src="/haim.jpg"
                 alt={`${person.name}, ${person.role}`}
                 width={400}
                 height={400}
                 priority
-                sizes="80px"
-                className="size-16 shrink-0 rounded-[var(--r)] object-cover sm:size-20"
+                sizes="(min-width: 1024px) 320px, 90vw"
+                className="aspect-square w-full rounded-[calc(var(--r)-3px)] object-cover"
               />
-              <div className="min-w-0">
-                <p className="truncate text-[16px] font-medium tracking-[-0.015em] text-[var(--fg)]">
-                  {person.name}
-                </p>
-                <p className="mt-1 text-[13px] text-[var(--fg-muted)]">{person.role}</p>
-                <p className="mt-0.5 font-mono text-[11.5px] text-[var(--fg-dim)]">
-                  {person.location}
-                </p>
-              </div>
+              <figcaption className="mt-4 px-1">
+                <p className="title text-[19px] text-[var(--ink)]">{person.name}</p>
+                <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">{person.discipline}</p>
+                <p className="mt-0.5 font-mono text-[11.5px] text-[var(--ink-3)]">{person.location}</p>
+              </figcaption>
             </div>
-
-            <dl className="grid grid-cols-2 gap-px bg-[var(--line)]">
-              {figures.map((f) => (
-                <div key={f.label} className="bg-[var(--bg)] p-5 sm:p-6">
-                  <dd className="font-mono text-[clamp(1.45rem,3vw,1.9rem)] leading-none tracking-[-0.04em] text-[var(--fg)]">
-                    {f.value}
-                  </dd>
-                  <dd className="mt-1.5 font-mono text-[11px] tracking-[0.02em] text-[var(--accent)]">
-                    {f.unit}
-                  </dd>
-                  <dt className="mt-2.5 text-[12.5px] leading-snug text-[var(--fg-dim)]">
-                    {f.label}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-          </motion.div>
-        </div>
-      </Shell>
-      <div id="top-sentinel" className="absolute left-0 top-2 h-px w-px" aria-hidden />
+            <motion.span
+              initial={reduce ? false : { opacity: 0, scale: 1.6, rotate: -18 }}
+              animate={{ opacity: 1, scale: 1, rotate: -12 }}
+              transition={{ duration: 0.35, delay: 2.1, ease: [0.2, 1.4, 0.4, 1] }}
+              className="stamp absolute -left-6 top-6 bg-[var(--sheet)] text-[15px] sm:-left-10"
+            >
+              Open to work
+              <span className="text-[9.5px] tracking-[0.14em]">QA roles and contracts</span>
+            </motion.span>
+          </motion.figure>
+        </motion.div>
+      </div>
     </section>
   );
 }

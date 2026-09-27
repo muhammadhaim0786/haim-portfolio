@@ -5,8 +5,7 @@ import { Shell } from "@/components/Primitives";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description:
-    "What this site collects, why, who processes it, and how to have it deleted.",
+  description: "What this site collects, why, who processes it, and how to have it deleted.",
   robots: { index: true, follow: true },
 };
 
@@ -31,16 +30,14 @@ const sections = [
     h: "Who else handles it",
     body: [
       "The site is hosted on Vercel, which processes standard server request data such as IP address and user agent in order to serve pages and keep the service running.",
-      "Form submissions are passed through a form delivery provider, which forwards the message to a personal email inbox. Your details sit with that provider and in that inbox.",
-      "Both are third parties with their own privacy terms. Neither is given your data for any purpose beyond delivering the message to me.",
+      "Form submissions are sent as an email through Resend, an email delivery service, to a personal inbox. Your details sit with Resend (for delivery logs) and in that inbox.",
+      "The WhatsApp and LinkedIn links open those services directly. Nothing is sent to them from this site unless you choose to start a conversation there.",
+      "All of these are third parties with their own privacy terms. None of them is given your data for any purpose beyond delivering the message to me.",
     ],
   },
   {
     h: "Storage on your device",
-    body: [
-      "One item only: your light or dark theme choice, kept in your browser's local storage so the site does not flip back on your next visit. It stays on your device, is never transmitted, and contains no identifier. Clearing your browser data removes it.",
-      "This site sets no cookies.",
-    ],
+    body: ["Nothing. This site sets no cookies and writes nothing to your browser's storage."],
   },
   {
     h: "How long it is kept",
@@ -68,33 +65,26 @@ export default function PrivacyPage() {
       <section className="py-20 md:py-28">
         <Shell>
           <div className="max-w-[68ch]">
-            <p className="font-mono text-[12px] text-[var(--fg-dim)]">Last updated {updated}</p>
+            <p className="font-mono text-[12px] text-[var(--ink-3)]">Last updated {updated}</p>
 
             {sections.map((s) => (
-              <div key={s.h} className="mt-12 border-t border-[var(--line)] pt-8 first:border-t-0">
-                <h2 className="text-[1.3rem] font-medium tracking-[-0.025em] text-[var(--fg)]">
-                  {s.h}
-                </h2>
+              <div key={s.h} className="mt-12 border-t border-[var(--rule)] pt-8 first:border-t-0">
+                <h2 className="title text-[1.5rem] text-[var(--ink)]">{s.h}</h2>
                 {s.body.map((para) => (
-                  <p
-                    key={para}
-                    className="mt-4 text-[15px] leading-[1.75] text-[var(--fg-muted)]"
-                  >
+                  <p key={para} className="mt-4 text-[15px] leading-[1.75] text-[var(--ink-2)]">
                     {para}
                   </p>
                 ))}
               </div>
             ))}
 
-            <div className="mt-12 border-t border-[var(--line)] pt-8">
-              <h2 className="text-[1.3rem] font-medium tracking-[-0.025em] text-[var(--fg)]">
-                Contact
-              </h2>
-              <p className="mt-4 text-[15px] leading-[1.75] text-[var(--fg-muted)]">
+            <div className="mt-12 border-t border-[var(--rule)] pt-8">
+              <h2 className="title text-[1.5rem] text-[var(--ink)]">Contact</h2>
+              <p className="mt-4 text-[15px] leading-[1.75] text-[var(--ink-2)]">
                 For anything on this page, including a deletion request, email{" "}
                 <a
                   href={`mailto:${person.email}`}
-                  className="break-all text-[var(--fg)] underline decoration-[var(--line-strong)] underline-offset-4 transition-colors hover:decoration-[var(--accent)]"
+                  className="break-all text-[var(--ink)] underline decoration-[var(--rule-strong)] underline-offset-4 transition-colors hover:decoration-[var(--red)]"
                 >
                   {person.email}
                 </a>

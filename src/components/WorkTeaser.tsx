@@ -1,51 +1,59 @@
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { work } from "@/content/resume";
+import { Strike } from "./Strike";
 import { Reveal } from "./Reveal";
 import { SectionHeading, Shell } from "./Primitives";
+import { WorkPinned } from "./WorkPinned";
 
-/** Compact index on the home page. The detail lives on /work. */
+/**
+ * Work as corrections. Desktop with motion allowed gets the pinned, scroll
+ * driven sequence; mobile and reduced motion get the same content as a list.
+ */
 export function WorkTeaser() {
   return (
-    <section className="border-t border-[var(--line)] bg-[var(--bg-2)] py-24 md:py-32">
-      <Shell>
+    <section className="py-16 md:py-12">
+      <div className="hidden motion-safe:md:[@media(min-height:700px)]:block">
+        <WorkPinned />
+      </div>
+
+      <Shell className="motion-safe:md:[@media(min-height:700px)]:hidden">
         <SectionHeading>Selected work</SectionHeading>
 
-        <ol className="mt-10">
+        <ol className="mt-12">
           {work.map((item, i) => (
-            <Reveal as="li" key={item.title} delay={i * 0.05}>
-              <Link
-                href="/work"
-                className="group grid gap-x-8 gap-y-2 border-t border-[var(--line)] py-7 transition-colors duration-200 hover:bg-[var(--bg)] sm:grid-cols-12 sm:items-baseline"
-              >
-                <span className="font-mono text-[11.5px] text-[var(--fg-dim)] sm:col-span-3">
-                  {item.client} / {item.year}
-                </span>
-                <span className="text-[1.15rem] font-medium leading-snug tracking-[-0.02em] text-[var(--fg)] sm:col-span-6">
+            <Reveal
+              as="li"
+              key={item.title}
+              delay={i * 0.05}
+              className="grid gap-6 border-t border-[var(--rule)] py-10 md:grid-cols-12 md:gap-10 md:py-12"
+            >
+              <div className="md:col-span-5">
+                <p className="font-mono text-[12px] text-[var(--ink-3)]">
+                  {item.client} / {item.year} / {item.kind}
+                </p>
+                <h3 className="title mt-3 max-w-[18ch] text-[clamp(1.6rem,2.6vw,2.1rem)] text-[var(--ink)]">
                   {item.title}
-                </span>
-                <span className="flex items-center gap-2 font-mono text-[12px] text-[var(--accent)] sm:col-span-3 sm:justify-end">
-                  {item.outcome[0].v}
-                  <ArrowRightIcon
-                    size={13}
-                    weight="bold"
-                    className="transition-transform duration-200 group-hover:translate-x-1"
-                  />
-                </span>
-              </Link>
+                </h3>
+              </div>
+              <div className="grid content-start gap-4 md:col-span-7 md:pt-7">
+                <p className="text-[clamp(1.05rem,1.6vw,1.3rem)] leading-snug text-[var(--ink-3)]">
+                  <span className="sr-only">Before: </span>
+                  <Strike>{item.before}</Strike>
+                </p>
+                <p className="text-[clamp(1.05rem,1.6vw,1.3rem)] leading-snug text-[var(--ink)]">
+                  <span className="sr-only">After: </span>
+                  {item.after}
+                </p>
+              </div>
             </Reveal>
           ))}
         </ol>
 
-        <Reveal>
-          <Link
-            href="/work"
-            className="mt-8 inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[var(--r)] border border-[var(--line-strong)] px-5 text-[14px] font-medium text-[var(--fg)] transition-colors duration-200 hover:bg-[var(--bg)] active:translate-y-px"
-          >
-            Read the case studies
-            <ArrowRightIcon size={14} weight="bold" />
-          </Link>
-        </Reveal>
+        <Link href="/work" className="btn btn-line mt-4">
+          Read the case studies
+          <ArrowRightIcon size={14} weight="bold" />
+        </Link>
       </Shell>
     </section>
   );

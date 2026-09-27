@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRightIcon, ListIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
+import { DownloadSimpleIcon, ListIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { person } from "@/content/resume";
-import { ThemeToggle } from "./ThemeToggle";
-import { Shell } from "./Primitives";
 
 const links = [
   { href: "/work", label: "Work" },
@@ -14,41 +12,29 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
+/**
+ * Full-width document header. The active page carries a red underline, the
+ * same mark the reviewer uses everywhere else on the site.
+ */
 export function Nav() {
   const pathname = usePathname();
-  const [lifted, setLifted] = useState(false);
   const [open, setOpen] = useState(false);
 
-  /* IntersectionObserver rather than a scroll listener: no per-frame work. */
   useEffect(() => {
-    // Every page renders a sentinel (Hero on home, PageHeader elsewhere).
-    const sentinel = document.getElementById("top-sentinel");
-    if (!sentinel) return;
-    const io = new IntersectionObserver(([entry]) => setLifted(!entry.isIntersecting), {
-      rootMargin: "-8px 0px 0px 0px",
-    });
-    io.observe(sentinel);
-    return () => io.disconnect();
-  }, [pathname]);
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
-    <header
-      className={`sticky top-0 z-40 border-b transition-colors duration-300 ${
-        lifted || open
-          ? "border-[var(--line)] bg-[var(--bg)] supports-[color:color-mix(in_srgb,red,red)]:bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-md"
-          : "border-transparent bg-transparent"
-      }`}
-    >
-      <Shell className="flex h-16 items-center justify-between gap-6">
-        <Link
-          href="/"
-          className="font-mono text-[13px] tracking-tight text-[var(--fg)] transition-opacity hover:opacity-70"
-        >
-          {person.name}
-          <span className="text-[var(--accent)]">.</span>
+    <header className="sticky top-0 z-50 border-b border-[var(--rule)] bg-[color-mix(in_srgb,var(--paper)_86%,transparent)] backdrop-blur-md">
+      <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between gap-6 px-5 sm:px-8">
+        <Link href="/" className="title text-[17px] text-[var(--ink)]">
+          Muhammad Haim
         </Link>
 
-        <nav aria-label="Pages" className="hidden items-center gap-7 sm:flex">
+        <nav aria-label="Pages" className="hidden items-center gap-8 md:flex">
           {links.map((l) => {
             const active = pathname === l.href;
             return (
@@ -56,31 +42,29 @@ export function Nav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`text-[13.5px] transition-colors duration-200 hover:text-[var(--fg)] ${
-                  active ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"
+                className={`redlink py-1 text-[14px] ${
+                  active
+                    ? "!bg-[length:100%_2px] text-[var(--ink)]"
+                    : "text-[var(--ink-2)] hover:text-[var(--ink)]"
                 }`}
               >
                 {l.label}
               </Link>
             );
           })}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
           <a
             href={person.cv}
             download={person.cvName}
-            className="hidden h-9 items-center whitespace-nowrap rounded-[var(--r)] border border-[var(--line-strong)] px-3.5 text-[13px] font-medium text-[var(--fg)] transition-colors duration-200 hover:bg-[var(--bg-2)] active:translate-y-px md:inline-flex"
+            className="flex items-center gap-1.5 text-[14px] text-[var(--ink-2)] transition-colors hover:text-[var(--red)]"
           >
-            Download CV
+            <DownloadSimpleIcon size={15} />
+            CV
           </a>
-          <Link
-            href="/contact"
-            className="hidden h-9 items-center gap-1.5 whitespace-nowrap rounded-[var(--r)] bg-[var(--accent)] px-3.5 text-[13px] font-medium text-[var(--accent-fg)] transition-[transform,opacity] duration-200 hover:opacity-90 active:translate-y-px sm:inline-flex"
-          >
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <Link href="/contact" className="btn btn-ink hidden !h-10 !px-4 !text-[13.5px] sm:inline-flex">
             Get in touch
-            <ArrowUpRightIcon size={13} weight="bold" />
           </Link>
           <button
             type="button"
@@ -88,26 +72,24 @@ export function Nav() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid size-9 place-items-center rounded-[var(--r)] border border-[var(--line)] text-[var(--fg)] transition-colors duration-200 hover:border-[var(--line-strong)] active:translate-y-px sm:hidden"
+            className="grid size-10 place-items-center rounded-[var(--r)] border border-[var(--rule-strong)] text-[var(--ink)] md:hidden"
           >
             {open ? <XIcon size={16} weight="bold" /> : <ListIcon size={16} weight="bold" />}
           </button>
         </div>
-      </Shell>
+      </div>
 
       {open ? (
-        <div id="mobile-nav" className="border-t border-[var(--line)] sm:hidden">
-          <Shell className="grid gap-1 py-3">
+        <div id="mobile-nav" className="border-t border-[var(--rule)] md:hidden">
+          <div className="mx-auto grid max-w-[1280px] gap-1 px-5 py-3 sm:px-8">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
                 aria-current={pathname === l.href ? "page" : undefined}
-                className={`rounded-[var(--r)] px-2 py-2.5 text-[15px] transition-colors ${
-                  pathname === l.href
-                    ? "bg-[var(--bg-2)] text-[var(--fg)]"
-                    : "text-[var(--fg-muted)]"
+                className={`rounded-[var(--r)] px-2 py-3 text-[16px] ${
+                  pathname === l.href ? "text-[var(--red)]" : "text-[var(--ink)]"
                 }`}
               >
                 {l.label}
@@ -117,11 +99,19 @@ export function Nav() {
               href={person.cv}
               download={person.cvName}
               onClick={() => setOpen(false)}
-              className="rounded-[var(--r)] px-2 py-2.5 text-[15px] text-[var(--fg-muted)]"
+              className="flex items-center gap-2 rounded-[var(--r)] px-2 py-3 text-[16px] text-[var(--ink)]"
             >
+              <DownloadSimpleIcon size={16} />
               Download CV
             </a>
-          </Shell>
+            <Link
+              href="/contact"
+              onClick={() => setOpen(false)}
+              className="btn btn-ink mb-2 mt-2 w-full sm:hidden"
+            >
+              Get in touch
+            </Link>
+          </div>
         </div>
       ) : null}
     </header>
