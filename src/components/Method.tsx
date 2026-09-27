@@ -11,7 +11,7 @@ export function Method() {
     <section className="border-t border-[var(--rule)] bg-[var(--paper-2)] py-24 md:py-32">
       <Shell>
         <SectionHeading id="method">How I work</SectionHeading>
-        <div className="mt-14 grid gap-px overflow-hidden rounded-[var(--r)] border border-[var(--rule)] bg-[var(--rule)] md:grid-cols-2">
+        <div className="mt-14 grid gap-px overflow-clip rounded-[var(--r)] border border-[var(--rule)] bg-[var(--rule)] md:grid-cols-2">
           {method.map((m, i) => (
             <Reveal key={m.title} delay={i * 0.05} className="bg-[var(--sheet)] p-7 sm:p-10">
               <span aria-hidden className="display block text-[3.4rem] leading-none text-[var(--red)]">

@@ -6,6 +6,7 @@ import { person } from "@/content/resume";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
+import { PenCursor } from "@/components/PenCursor";
 import "./globals.css";
 
 /* Bricolage Grotesque variable (weight, width, optical size), self-hosted
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
         <Footer />
         <WhatsAppFloat />
+        <PenCursor />
       </body>
     </html>
   );

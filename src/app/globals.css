@@ -50,6 +50,7 @@
   --font-display: var(--font-display);
 }
 
+@layer base {
 * { border-color: var(--rule); }
 
 html {
@@ -76,7 +77,9 @@ body {
   outline-offset: 3px;
   border-radius: 4px;
 }
+}
 
+@layer components {
 /* ---------- Type ---------- */
 
 .display {
@@ -214,6 +217,7 @@ body {
     var(--rule) 39px 40px
   );
   mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 70%, transparent);
+}
 }
 
 /* ---------- Toolchain marquee (the only marquee on the site) ---------- */

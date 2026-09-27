@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import {
   DownloadSimpleIcon,
   EnvelopeSimpleIcon,
@@ -21,6 +22,13 @@ const ease = [0.16, 1, 0.3, 1] as const;
  */
 export function Hero() {
   const reduce = useReducedMotion();
+  // Depth on scroll: paper lines drift slower than the page, the photo a
+  // little faster, the copy stays put. Transform only, off under reduced motion.
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const linesY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 140]);
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -90]);
+  const photoR = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -3]);
   const rise = (d: number) => ({
     initial: reduce ? false : { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
@@ -28,8 +36,12 @@ export function Hero() {
   });
 
   return (
-    <section id="top" className="relative isolate overflow-hidden">
-      <div aria-hidden className="ruled absolute inset-0 -z-10 opacity-70" />
+    <section ref={ref} id="top" className="relative isolate overflow-hidden">
+      <motion.div
+        aria-hidden
+        style={{ y: linesY }}
+        className="ruled absolute -bottom-40 -top-4 inset-x-0 -z-10 opacity-70"
+      />
 
       <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-12 lg:py-16">
         <div className="lg:col-span-8">
@@ -93,36 +105,38 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <motion.figure
-          {...rise(0.35)}
+        <motion.div
+          style={{ y: photoY, rotate: photoR }}
           className="relative mx-auto w-full max-w-[340px] lg:col-span-4 lg:mx-0 lg:justify-self-end"
         >
-          <div className="sheet rotate-[1.5deg] p-3 pb-4 shadow-[0_30px_60px_-35px_rgb(19_21_24_/_0.45)] transition-transform duration-500 hover:rotate-0">
-            <Image
-              src="/haim.jpg"
-              alt={`${person.name}, ${person.role}`}
-              width={400}
-              height={400}
-              priority
-              sizes="(min-width: 1024px) 320px, 90vw"
-              className="aspect-square w-full rounded-[calc(var(--r)-3px)] object-cover"
-            />
-            <figcaption className="mt-4 px-1">
-              <p className="title text-[19px] text-[var(--ink)]">{person.name}</p>
-              <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">{person.discipline}</p>
-              <p className="mt-0.5 font-mono text-[11.5px] text-[var(--ink-3)]">{person.location}</p>
-            </figcaption>
-          </div>
-          <motion.span
-            initial={reduce ? false : { opacity: 0, scale: 1.6, rotate: -18 }}
-            animate={{ opacity: 1, scale: 1, rotate: -12 }}
-            transition={{ duration: 0.35, delay: 2.1, ease: [0.2, 1.4, 0.4, 1] }}
-            className="stamp absolute -left-6 top-6 bg-[var(--sheet)] text-[15px] sm:-left-10"
-          >
-            Open to work
-            <span className="text-[9.5px] tracking-[0.14em]">QA roles and contracts</span>
-          </motion.span>
-        </motion.figure>
+          <motion.figure {...rise(0.35)} className="relative">
+            <div className="sheet rotate-[1.5deg] p-3 pb-4 shadow-[0_30px_60px_-35px_rgb(19_21_24_/_0.45)] transition-transform duration-500 hover:rotate-0">
+              <Image
+                src="/haim.jpg"
+                alt={`${person.name}, ${person.role}`}
+                width={400}
+                height={400}
+                priority
+                sizes="(min-width: 1024px) 320px, 90vw"
+                className="aspect-square w-full rounded-[calc(var(--r)-3px)] object-cover"
+              />
+              <figcaption className="mt-4 px-1">
+                <p className="title text-[19px] text-[var(--ink)]">{person.name}</p>
+                <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">{person.discipline}</p>
+                <p className="mt-0.5 font-mono text-[11.5px] text-[var(--ink-3)]">{person.location}</p>
+              </figcaption>
+            </div>
+            <motion.span
+              initial={reduce ? false : { opacity: 0, scale: 1.6, rotate: -18 }}
+              animate={{ opacity: 1, scale: 1, rotate: -12 }}
+              transition={{ duration: 0.35, delay: 2.1, ease: [0.2, 1.4, 0.4, 1] }}
+              className="stamp absolute -left-6 top-6 bg-[var(--sheet)] text-[15px] sm:-left-10"
+            >
+              Open to work
+              <span className="text-[9.5px] tracking-[0.14em]">QA roles and contracts</span>
+            </motion.span>
+          </motion.figure>
+        </motion.div>
       </div>
     </section>
   );

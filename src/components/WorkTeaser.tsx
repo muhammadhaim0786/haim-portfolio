@@ -4,15 +4,20 @@ import { work } from "@/content/resume";
 import { Strike } from "./Strike";
 import { Reveal } from "./Reveal";
 import { SectionHeading, Shell } from "./Primitives";
+import { WorkPinned } from "./WorkPinned";
 
 /**
- * Work as corrections. Each row shows the state before, struck through by the
- * reviewer as it scrolls into view, and the state after, written underneath.
+ * Work as corrections. Desktop with motion allowed gets the pinned, scroll
+ * driven sequence; mobile and reduced motion get the same content as a list.
  */
 export function WorkTeaser() {
   return (
-    <section className="py-24 md:py-32">
-      <Shell>
+    <section className="py-16 md:py-12">
+      <div className="hidden md:block motion-reduce:md:hidden">
+        <WorkPinned />
+      </div>
+
+      <Shell className="md:hidden motion-reduce:md:block">
         <SectionHeading>Selected work</SectionHeading>
 
         <ol className="mt-12">
