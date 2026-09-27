@@ -24,6 +24,7 @@ const MAX = { name: 100, email: 160, company: 120, message: 4000 } as const;
 // Single source of truth: the same list drives the form's dropdown.
 const TOPICS: Record<string, string> = Object.fromEntries(inquiryTopics.map((t) => [t.value, t.label]));
 const TIMEOUT_MS = 15000;
+const MAX_BODY_BYTES = 16_000; // a full form is ~5 KB; anything bigger is not a person
 const DEFAULT_TO = person.email;
 const DEFAULT_FROM = "Portfolio Inquiry <onboarding@resend.dev>";
 
@@ -79,7 +80,35 @@ export async function POST(request: Request) {
     );
   }
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  // Cross-site posts: browsers always send Origin on POST. A form on another
+  // site (e.g. enctype="text/plain" carrying JSON) would otherwise be parsed
+  // below and could relay mail through visitors' browsers.
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (origin) {
+    let originHost = "";
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      /* malformed origin, treated as foreign */
+    }
+    if (!host || originHost !== host) {
+      return NextResponse.json({ ok: false, error: "Forbidden." }, { status: 403 });
+    }
+  }
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+    return NextResponse.json({ ok: false, error: "Unsupported content type." }, { status: 415 });
+  }
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ ok: false, error: "Message too large." }, { status: 413 });
+  }
+
+  // Vercel sets x-real-ip itself; x-forwarded-for's first entry can be client supplied elsewhere.
+  const ip =
+    request.headers.get("x-real-ip")?.trim() ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
   if (limited(ip)) {
     return NextResponse.json(
       { ok: false, error: "Too many messages from this connection. Please try again in a few minutes." },
@@ -87,9 +116,17 @@ export async function POST(request: Request) {
     );
   }
 
+  // Read as text with a hard cap: content-length can be absent or wrong
+  // (chunked uploads), so the size is checked on what actually arrived.
   let body: Payload;
   try {
-    body = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ ok: false, error: "Message too large." }, { status: 413 });
+    }
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("not an object");
+    body = parsed as Payload;
   } catch {
     return NextResponse.json({ ok: false, error: "Malformed request." }, { status: 400 });
   }
@@ -109,7 +146,8 @@ export async function POST(request: Request) {
   if (name.length < 2) fields.name = "Please enter your name.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) fields.email = "Please enter a valid email address.";
   if (message.length < 20) fields.message = "Please write at least a sentence or two (20+ characters).";
-  if (!(topic in TOPICS)) fields.topic = "Please choose one of the listed options.";
+  // Own-property check: `in` would accept "constructor", "toString", etc.
+  if (!Object.hasOwn(TOPICS, topic)) fields.topic = "Please choose one of the listed options.";
 
   if (Object.keys(fields).length > 0) {
     return NextResponse.json({ ok: false, fields }, { status: 422 });
@@ -139,7 +177,7 @@ export async function POST(request: Request) {
       <tr><td style="padding:4px 16px 4px 0;color:#666">Email</td><td><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
       <tr><td style="padding:4px 16px 4px 0;color:#666">Company</td><td>${esc(company || "Not given")}</td></tr>
     </table>
-    <div style="font-size:15px;line-height:1.6;white-space:pre-wrap;border-left:3px solid #a3e635;padding-left:14px">${esc(message)}</div>
+    <div style="font-size:15px;line-height:1.6;white-space:pre-wrap;border-left:3px solid #c8281c;padding-left:14px">${esc(message)}</div>
     <p style="margin-top:28px;font-size:12px;color:#888">Hit reply to answer ${esc(name)} directly.</p>
   </div>`;
 

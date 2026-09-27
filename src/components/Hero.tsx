@@ -46,7 +46,9 @@ export function Hero() {
       <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-12 lg:py-16">
         <div className="lg:col-span-8">
           <motion.h1
-            {...rise(0)}
+            initial={reduce ? false : { y: 14 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.7, ease }}
             className="display max-w-[17ch] text-[clamp(2.6rem,5.4vw,5.1rem)] text-[var(--ink)]"
           >
             Every release has a{" "}

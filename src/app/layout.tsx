@@ -67,7 +67,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${GeistSans.variable} ${GeistMono.variable} ${display.variable} antialiased`}>
         <a
           href="#main"

@@ -13,11 +13,11 @@ import { WorkPinned } from "./WorkPinned";
 export function WorkTeaser() {
   return (
     <section className="py-16 md:py-12">
-      <div className="hidden md:block motion-reduce:md:hidden">
+      <div className="hidden motion-safe:md:[@media(min-height:700px)]:block">
         <WorkPinned />
       </div>
 
-      <Shell className="md:hidden motion-reduce:md:block">
+      <Shell className="motion-safe:md:[@media(min-height:700px)]:hidden">
         <SectionHeading>Selected work</SectionHeading>
 
         <ol className="mt-12">

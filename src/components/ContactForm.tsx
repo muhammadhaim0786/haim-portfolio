@@ -8,7 +8,7 @@ type Status = "idle" | "submitting" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message" | "topic", string>>;
 
 const field =
-  "w-full rounded-[var(--r)] border bg-[var(--paper)] px-4 py-3 text-[15px] text-[var(--ink)] transition-[border-color,box-shadow] duration-200 placeholder:text-[var(--ink-3)] focus:border-[var(--red)] focus:shadow-[0_0_0_4px_rgb(198_243_94_/_0.12)] focus:outline-none";
+  "w-full rounded-[var(--r)] border bg-[var(--paper)] px-4 py-3 text-[15px] text-[var(--ink)] transition-[border-color,box-shadow] duration-200 placeholder:text-[var(--ink-3)] focus:border-[var(--red)] focus:shadow-[0_0_0_4px_var(--red-wash)] focus:outline-none";
 
 function Label({ htmlFor, children, optional }: { htmlFor: string; children: string; optional?: boolean }) {
   return (

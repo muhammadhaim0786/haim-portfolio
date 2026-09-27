@@ -37,15 +37,17 @@ export function Figures() {
           {figures.map((f, i) => (
             <div
               key={f.label}
-              className={`py-9 md:py-11 ${i % 2 === 1 ? "pl-5 sm:pl-8" : "pr-5"} ${
+              className={`flex flex-col py-9 md:py-11 ${i % 2 === 1 ? "pl-5 sm:pl-8" : "pr-5"} ${
                 i > 0 ? "lg:border-l lg:border-[var(--rule)] lg:pl-8" : ""
               } ${i < 2 ? "border-b border-[var(--rule)] lg:border-b-0" : ""} ${i % 2 === 1 ? "border-l border-[var(--rule)]" : ""}`}
             >
-              <dd className="display text-[clamp(2.4rem,4.6vw,3.8rem)] text-[var(--ink)]">
+              <dt className="order-3 mt-1.5 max-w-[24ch] text-[14px] leading-snug text-[var(--ink-2)]">
+                {f.label}
+              </dt>
+              <dd className="display order-1 text-[clamp(2.4rem,4.6vw,3.8rem)] text-[var(--ink)]">
                 <Count value={f.value} />
               </dd>
-              <dd className="note mt-2">{f.unit}</dd>
-              <dt className="mt-1.5 max-w-[24ch] text-[14px] leading-snug text-[var(--ink-2)]">{f.label}</dt>
+              <dd className="note order-2 mt-2">{f.unit}</dd>
             </div>
           ))}
         </dl>
