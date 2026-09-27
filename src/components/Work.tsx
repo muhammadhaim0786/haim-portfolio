@@ -1,105 +1,61 @@
 import { work } from "@/content/resume";
+import { Note } from "./Note";
 import { Reveal } from "./Reveal";
-import { SectionHeading, Shell } from "./Primitives";
-import { SpotlightCard } from "./SpotlightCard";
+import { Strike } from "./Strike";
+import { Shell } from "./Primitives";
 
-const [feature, ...rest] = work;
-
-function TechRow({ tech }: { tech: readonly string[] }) {
-  return (
-    <ul className="flex flex-wrap gap-2">
-      {tech.map((t) => (
-        <li key={t} className="chip">
-          {t}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** Three items, three cells. One feature cell, two supporting cells. */
+/**
+ * Full case studies. Each one reads as a review: the state before (struck),
+ * the work, and the outcome figures in the margin column.
+ */
 export function Work() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-20 md:py-28">
       <Shell>
-        <SectionHeading id="work">
-          Case <span className="stroke-text">studies</span>
-        </SectionHeading>
-
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
-          <Reveal as="article" className="md:col-span-2">
-            <SpotlightCard
-              className="card h-full overflow-hidden p-7 sm:p-11"
-              style={{
-                backgroundImage:
-                  "radial-gradient(90% 120% at 100% 0%, rgb(198 243 94 / 0.14), transparent 62%)",
-              }}
-            >
-              <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-                <div className="lg:col-span-7">
-                  <p className="font-mono text-[12px] text-[var(--fg-dim)]">
-                    {feature.client} / {feature.year} / {feature.kind}
+        <ol className="grid gap-6">
+          {work.map((item, i) => (
+            <Reveal as="li" key={item.title} delay={i * 0.04}>
+              <article className="sheet grid gap-10 p-7 sm:p-10 lg:grid-cols-12 lg:gap-12">
+                <div className="lg:col-span-8">
+                  <p className="font-mono text-[12px] text-[var(--ink-3)]">
+                    {item.client} / {item.year} / {item.kind}
                   </p>
-                  <h3 className="display-soft mt-4 max-w-[16ch] text-[clamp(1.9rem,3.6vw,3rem)] text-[var(--fg)]">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-6 max-w-[58ch] text-[15.5px] leading-relaxed text-[var(--fg-muted)]">
-                    {feature.body}
+                  <h2 className="display mt-4 max-w-[18ch] text-[clamp(1.9rem,3.6vw,3rem)] text-[var(--ink)]">
+                    {item.title}
+                  </h2>
+                  <p className="mt-6 text-[clamp(1.05rem,1.5vw,1.2rem)] leading-snug text-[var(--ink-3)]">
+                    <span className="sr-only">Before: </span>
+                    <Strike>{item.before}</Strike>
                   </p>
-                  <div className="mt-8">
-                    <TechRow tech={feature.tech} />
-                  </div>
+                  <p className="mt-5 max-w-[62ch] text-[16px] leading-relaxed text-[var(--ink-2)]">
+                    {item.body}
+                  </p>
+                  <ul className="mt-7 flex flex-wrap gap-x-4 gap-y-1.5">
+                    {item.tech.map((t) => (
+                      <li key={t} className="font-mono text-[12.5px] text-[var(--ink-3)]">
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <dl className="grid content-start gap-7 border-t border-[var(--line)] pt-8 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
-                  {feature.outcome.map((o) => (
-                    <div key={o.k}>
-                      <dt className="text-[13px] text-[var(--fg-dim)]">{o.k}</dt>
-                      <dd className="display-soft mt-2 text-[clamp(1.4rem,2.3vw,2rem)] leading-[1.05] text-[var(--accent)]">
-                        {o.v}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            </SpotlightCard>
-          </Reveal>
-
-          {rest.map((item, i) => (
-            <Reveal as="article" key={item.title} delay={0.06 * (i + 1)}>
-              <SpotlightCard
-                className="card flex h-full flex-col p-7 sm:p-9"
-                style={
-                  i === 0
-                    ? {
-                        backgroundImage:
-                          "repeating-linear-gradient(135deg, rgb(236 244 220 / 0.05) 0 1px, transparent 1px 12px)",
-                      }
-                    : { background: "var(--surface-2)" }
-                }
-              >
-                <p className="font-mono text-[12px] text-[var(--fg-dim)]">
-                  {item.client} / {item.year} / {item.kind}
-                </p>
-                <h3 className="display-soft mt-4 text-[1.7rem] leading-[1.05] text-[var(--fg)]">
-                  {item.title}
-                </h3>
-                <p className="mt-5 max-w-[46ch] flex-1 text-[15px] leading-relaxed text-[var(--fg-muted)]">
-                  {item.body}
-                </p>
-                {item.outcome.map((o) => (
-                  <div key={o.k} className="mt-7">
-                    <p className="text-[13px] text-[var(--fg-dim)]">{o.k}</p>
-                    <p className="display-soft mt-2 text-[1.8rem] text-[var(--accent)]">{o.v}</p>
-                  </div>
-                ))}
-                <div className="mt-7">
-                  <TechRow tech={item.tech} />
+                <div className="grid content-start gap-6 border-t border-[var(--rule)] pt-8 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-1">
+                  <dl className="grid gap-6">
+                    {item.outcome.map((o) => (
+                      <div key={o.k}>
+                        <dt className="text-[13px] text-[var(--ink-3)]">{o.k}</dt>
+                        <dd className="title mt-1.5 text-[clamp(1.35rem,2vw,1.7rem)] text-[var(--ink)]">
+                          {o.v}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <Note>{item.after}</Note>
                 </div>
-              </SpotlightCard>
+              </article>
             </Reveal>
           ))}
-        </div>
+        </ol>
       </Shell>
     </section>
   );

@@ -8,13 +8,13 @@ type Status = "idle" | "submitting" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message" | "topic", string>>;
 
 const field =
-  "w-full rounded-[var(--r-input)] border bg-[var(--bg)] px-4 py-3 text-[15px] text-[var(--fg)] transition-[border-color,box-shadow] duration-200 placeholder:text-[var(--fg-dim)] focus:border-[var(--accent)] focus:shadow-[0_0_0_4px_rgb(198_243_94_/_0.12)] focus:outline-none";
+  "w-full rounded-[var(--r)] border bg-[var(--paper)] px-4 py-3 text-[15px] text-[var(--ink)] transition-[border-color,box-shadow] duration-200 placeholder:text-[var(--ink-3)] focus:border-[var(--red)] focus:shadow-[0_0_0_4px_rgb(198_243_94_/_0.12)] focus:outline-none";
 
 function Label({ htmlFor, children, optional }: { htmlFor: string; children: string; optional?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="text-[13px] font-medium text-[var(--fg)]">
+    <label htmlFor={htmlFor} className="text-[13px] font-medium text-[var(--ink)]">
       {children}
-      {optional ? <span className="ml-1.5 font-normal text-[var(--fg-dim)]">optional</span> : null}
+      {optional ? <span className="ml-1.5 font-normal text-[var(--ink-3)]">optional</span> : null}
     </label>
   );
 }
@@ -22,7 +22,7 @@ function Label({ htmlFor, children, optional }: { htmlFor: string; children: str
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} className="flex items-start gap-1.5 text-[12.5px] text-[#ff8a7a]">
+    <p id={id} className="flex items-start gap-1.5 text-[12.5px] text-[var(--red)]">
       <WarningCircleIcon size={14} weight="fill" className="mt-[1px] shrink-0" />
       {message}
     </p>
@@ -77,16 +77,16 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
   if (status === "sent") {
     return (
       <div role="status" className="py-10 text-center">
-        <CheckCircleIcon size={40} weight="fill" className="mx-auto text-[var(--accent)]" />
-        <p className="display-soft mt-5 text-[1.8rem] text-[var(--fg)]">Message sent</p>
-        <p className="mx-auto mt-2 max-w-[42ch] text-[14px] leading-relaxed text-[var(--fg-muted)]">
-          It lands in my inbox directly. I reply to everything within 48 hours, including the ones
-          that are not a fit.
+        <CheckCircleIcon size={40} weight="fill" className="mx-auto text-[var(--red)]" />
+        <p className="title mt-5 text-[1.8rem] text-[var(--ink)]">Message sent</p>
+        <p className="mx-auto mt-2 max-w-[42ch] text-[14px] leading-relaxed text-[var(--ink-2)]">
+          It lands in my inbox directly. I reply to everything within 48 hours, including the ones that are
+          not a fit.
         </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
-          className="mt-6 text-[13.5px] text-[var(--fg)] underline decoration-[var(--line-strong)] underline-offset-4 transition-colors hover:decoration-[var(--accent)]"
+          className="mt-6 text-[13.5px] text-[var(--ink)] underline decoration-[var(--rule-strong)] underline-offset-4 transition-colors hover:decoration-[var(--red)]"
         >
           Send another
         </button>
@@ -111,7 +111,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
           name="topic"
           defaultValue={defaultTopic ?? inquiryTopics[0].value}
           disabled={busy}
-          className={`${field} border-[var(--line-strong)] disabled:opacity-60`}
+          className={`${field} border-[var(--rule-strong)] disabled:opacity-60`}
         >
           {inquiryTopics.map((t) => (
             <option key={t.value} value={t.value}>
@@ -133,7 +133,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
             className={`${field} disabled:opacity-60 ${
-              errors.name ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
+              errors.name ? "border-[var(--red)]" : "border-[var(--rule-strong)]"
             }`}
           />
           <FieldError id="name-error" message={errors.name} />
@@ -150,7 +150,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
             className={`${field} disabled:opacity-60 ${
-              errors.email ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
+              errors.email ? "border-[var(--red)]" : "border-[var(--rule-strong)]"
             }`}
           />
           <FieldError id="email-error" message={errors.email} />
@@ -167,7 +167,7 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
           type="text"
           autoComplete="organization"
           disabled={busy}
-          className={`${field} border-[var(--line-strong)] disabled:opacity-60`}
+          className={`${field} border-[var(--rule-strong)] disabled:opacity-60`}
         />
       </div>
 
@@ -181,13 +181,13 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "message-error" : "message-help"}
           className={`${field} resize-y disabled:opacity-60 ${
-            errors.message ? "border-[#ff8a7a]" : "border-[var(--line-strong)]"
+            errors.message ? "border-[var(--red)]" : "border-[var(--rule-strong)]"
           }`}
         />
         {errors.message ? (
           <FieldError id="message-error" message={errors.message} />
         ) : (
-          <p id="message-help" className="text-[12.5px] text-[var(--fg-dim)]">
+          <p id="message-help" className="text-[12.5px] text-[var(--ink-3)]">
             The stack, how you ship today, and what is currently getting caught late.
           </p>
         )}
@@ -196,14 +196,14 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
       {status === "error" ? (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-[var(--r-input)] border border-[#ff8a7a]/60 bg-[#ff8a7a]/10 px-4 py-3"
+          className="flex items-start gap-2.5 rounded-[var(--r)] border border-[var(--red)] bg-[var(--red-wash)] px-4 py-3"
         >
-          <WarningCircleIcon size={16} weight="fill" className="mt-[2px] shrink-0 text-[#ff8a7a]" />
-          <p className="text-[13.5px] leading-relaxed text-[var(--fg)]">
+          <WarningCircleIcon size={16} weight="fill" className="mt-[2px] shrink-0 text-[var(--red)]" />
+          <p className="text-[13.5px] leading-relaxed text-[var(--ink)]">
             {formError}{" "}
             <a
               href={`mailto:${person.email}`}
-              className="underline decoration-[var(--line-strong)] underline-offset-4 hover:decoration-[var(--accent)]"
+              className="underline decoration-[var(--rule-strong)] underline-offset-4 hover:decoration-[var(--red)]"
             >
               {person.email}
             </a>
@@ -215,12 +215,12 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
         <button
           type="submit"
           disabled={busy}
-          className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-70"
+          className="btn btn-ink disabled:cursor-not-allowed disabled:opacity-70"
         >
           {busy ? "Sending..." : "Send message"}
           {busy ? null : <ArrowUpRightIcon size={14} weight="bold" />}
         </button>
-        <p aria-live="polite" className="text-[12.5px] text-[var(--fg-dim)]">
+        <p aria-live="polite" className="text-[12.5px] text-[var(--ink-3)]">
           {busy ? "Sending your message" : "I reply within 48 hours."}
         </p>
       </div>

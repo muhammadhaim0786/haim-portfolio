@@ -51,8 +51,7 @@ export const roles = [
     period: "Sep 2025 to Aug 2026",
     place: "New York, NY (Remote)",
     current: false,
-    summary:
-      "Owned automated UI regression and release validation for a production engineering org.",
+    summary: "Owned automated UI regression and release validation for a production engineering org.",
     points: [
       "Designed, developed, and maintained automated UI coverage in Playwright with Java on Page Object Model architecture, improving regression efficiency and reuse.",
       "Increased regression coverage while cutting execution time by roughly 30 to 50 percent through suite optimization.",
@@ -67,8 +66,7 @@ export const roles = [
     period: "Mar 2024 to Sep 2025",
     place: "Islamabad, Pakistan",
     current: false,
-    summary:
-      "Led QA automation for SASO HERC, a Saudi government digital compliance platform.",
+    summary: "Led QA automation for SASO HERC, a Saudi government digital compliance platform.",
     points: [
       "Designed and implemented a scalable Playwright and TypeScript automation framework on Page Object Model architecture.",
       "Reduced manual regression effort by more than 60 percent through reusable coverage and framework improvements.",
@@ -116,8 +114,9 @@ export const work = [
     year: "2026",
     kind: "Process design",
     feature: true,
-    body:
-      "Healthcare product, eight domains, no QA process in place. I wrote the test strategy, defined a layered coverage taxonomy that assigns each behavior to the layer that owns it, and set up per-PR manual test plans, exploratory passes, and a single triage pipeline in Linear that merges QA findings, customer reports, and stage testing.",
+    before: "No formal QA process across eight product domains",
+    after: "A QA function, one triage pipeline, 30+ defects triaged a month",
+    body: "Healthcare product, eight domains, no QA process in place. I wrote the test strategy, defined a layered coverage taxonomy that assigns each behavior to the layer that owns it, and set up per-PR manual test plans, exploratory passes, and a single triage pipeline in Linear that merges QA findings, customer reports, and stage testing.",
     outcome: [
       { k: "Defects triaged", v: "30+ per month" },
       { k: "Domains covered", v: "8" },
@@ -131,8 +130,9 @@ export const work = [
     year: "2024",
     kind: "Test automation",
     feature: false,
-    body:
-      "A scalable Playwright and TypeScript framework on Page Object Model architecture for a Saudi government compliance platform, built for reuse across a wide surface of regulated workflows.",
+    before: "Regression checked by hand, release after release",
+    after: "A reusable Playwright framework, manual regression effort down ~60%",
+    body: "A scalable Playwright and TypeScript framework on Page Object Model architecture for a Saudi government compliance platform, built for reuse across a wide surface of regulated workflows.",
     outcome: [{ k: "Manual regression effort", v: "down ~60%" }],
     tech: ["Playwright", "TypeScript", "POM"],
   },
@@ -142,8 +142,9 @@ export const work = [
     year: "2025",
     kind: "Performance",
     feature: false,
-    body:
-      "JMeter test plans simulating 1,000+ concurrent users against the platform APIs, with bottleneck analysis and proposed optimizations for response time and stability.",
+    before: "API behavior under heavy load not yet measured",
+    after: "JMeter plans modelling 1,000+ concurrent users, bottlenecks named",
+    body: "JMeter test plans simulating 1,000+ concurrent users against the platform APIs, with bottleneck analysis and proposed optimizations for response time and stability.",
     outcome: [{ k: "Peak concurrency modelled", v: "1,000+ users" }],
     tech: ["Apache JMeter", "REST APIs"],
   },
@@ -288,12 +289,73 @@ export const paths = [
     start: "Send how you ship today and where defects are currently getting caught.",
     reply: "Reply within 48 hours.",
   },
+  {
+    id: "appbuild",
+    title: "App build with AI",
+    forWho: "Founders and teams who need a web or mobile app built fast without shipping AI-generated bugs.",
+    youGet:
+      "A working app built with AI agents, then tested like a release: flows, API, data, and edge cases checked before launch.",
+    start: "Send what the app should do, who uses it, and your deadline.",
+    reply: "Reply within 48 hours.",
+  },
+] as const;
+
+/**
+ * Things built with AI. Status is stated as it really is; update it as each
+ * one ships. Add `href` (live URL or public repo) when available. `image` is an
+ * illustrative cover (generated with Higgsfield), not a product screenshot;
+ * download it into /public/builds and use a local path so it never expires.
+ * Kiraman Katibeen is client work: confirm the client is fine with it being
+ * listed before deploying, or delete the entry.
+ */
+export const builds = [
+  {
+    name: "Ghareeb Creator",
+    kind: "AI content engine",
+    status: "Working, private repo",
+    what: "Turns a topic into a finished vertical short video: an AI-written script, voiceover, stock footage, and a rendered edit. Runs in English and Urdu across ten niches.",
+    ai: "Gemini writes the scripts, edge-tts voices them, Pexels supplies the footage, moviepy renders the cut.",
+    stack: ["Python", "Gemini API", "edge-tts", "moviepy", "Pexels API"],
+    href: "",
+    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181900_e7f68373-1edd-4930-a13f-368e0caa22e7.png",
+  },
+  {
+    name: "Eightbridge Solutions",
+    kind: "Company site and CMS",
+    status: "In build",
+    what: "A business site where everything, from company name to logo, is edited from an admin CMS. Built toward a template product others can use to launch their own site.",
+    ai: "Built with an AI agent team for development and QA, reviewed and hardened by hand.",
+    stack: ["Supabase", "Resend", "Vercel", "Admin CMS"],
+    href: "",
+    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181927_04d58235-9d30-4f84-9558-afb16506eac0.png",
+  },
+  {
+    name: "Kiraman Katibeen",
+    kind: "Mobile app, client work",
+    status: "In build",
+    what: "The Book of My Salah: a prayer logging and reflection app for iOS and Android, with prayer times and notifications. Built solo, full stack, from the client's brief to an engineering PRD.",
+    ai: "AI-assisted build, with every release checked the way I check production software.",
+    stack: ["Flutter", "Supabase", "iOS", "Android"],
+    href: "",
+    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_181953_2ddb57d0-ddf0-435b-860d-7412922a5cca.png",
+  },
+  {
+    name: "GeoRun",
+    kind: "3D mobile game",
+    status: "In design",
+    what: "An endless runner where you pick any place on the globe and run its real streets and buildings.",
+    ai: "Production PRD and architecture drafted with AI; build planned in Flutter and Flame.",
+    stack: ["Flutter", "Flame", "3D", "Maps data"],
+    href: "",
+    image: "https://d8j0ntlcm91z4.cloudfront.net/user_3IyKlgXh4lhLzRjcueZ4kGjc810/hf_20260927_182012_9d800f48-1d47-4daf-9e72-c7937282a6b9.png",
+  },
 ] as const;
 
 export const inquiryTopics = [
   { value: "fulltime", label: "Full-time role" },
   { value: "automation", label: "Automation build or rescue" },
   { value: "process", label: "QA process setup" },
+  { value: "appbuild", label: "App build with AI" },
   { value: "other", label: "Something else" },
 ] as const;
 

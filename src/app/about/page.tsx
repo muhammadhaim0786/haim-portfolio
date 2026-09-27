@@ -19,7 +19,7 @@ export default function AboutPage() {
     <>
       <PageHeader
         title="About"
-        accent="me."
+        marked="me."
         lede="Quality Engineer, four and a half years in, currently owning release quality for a healthcare product across eight domains."
       />
 
@@ -35,14 +35,12 @@ export default function AboutPage() {
                   height={400}
                   quality={90}
                   priority
-                  className="w-full max-w-[380px] rounded-[var(--r-card)] border border-[var(--line-strong)] object-cover shadow-[0_30px_80px_-30px_rgb(128_160_44_/_0.6)]"
+                  className="w-full max-w-[380px] rounded-[var(--r)] border border-[var(--rule-strong)] object-cover rotate-[-1deg] bg-[var(--sheet)] p-2 shadow-[0_30px_60px_-35px_rgb(19_21_24_/_0.45)]"
                 />
                 <figcaption className="mt-5 grid gap-1">
-                  <span className="display-soft text-[1.3rem] text-[var(--fg)]">{person.name}</span>
-                  <span className="text-[13.5px] text-[var(--fg-muted)]">{person.role}</span>
-                  <span className="font-mono text-[11.5px] text-[var(--fg-dim)]">
-                    {person.location}
-                  </span>
+                  <span className="title text-[1.3rem] text-[var(--ink)]">{person.name}</span>
+                  <span className="text-[13.5px] text-[var(--ink-2)]">{person.role}</span>
+                  <span className="font-mono text-[11.5px] text-[var(--ink-3)]">{person.location}</span>
                 </figcaption>
               </figure>
             </Reveal>
@@ -50,7 +48,7 @@ export default function AboutPage() {
             <div className="lg:col-span-7">
               {bio.map((para, i) => (
                 <Reveal key={para} delay={i * 0.05}>
-                  <p className="mb-6 max-w-[62ch] text-[17px] leading-[1.75] text-[var(--fg-muted)] first:text-[var(--fg)] first:text-[1.35rem] first:leading-[1.5]">
+                  <p className="mb-6 max-w-[62ch] text-[17px] leading-[1.75] text-[var(--ink-2)] first:text-[var(--ink)] first:text-[1.35rem] first:leading-[1.5]">
                     {para}
                   </p>
                 </Reveal>

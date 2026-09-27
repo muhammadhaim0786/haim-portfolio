@@ -22,9 +22,7 @@ export const dynamic = "force-dynamic";
 
 const MAX = { name: 100, email: 160, company: 120, message: 4000 } as const;
 // Single source of truth: the same list drives the form's dropdown.
-const TOPICS: Record<string, string> = Object.fromEntries(
-  inquiryTopics.map((t) => [t.value, t.label]),
-);
+const TOPICS: Record<string, string> = Object.fromEntries(inquiryTopics.map((t) => [t.value, t.label]));
 const TIMEOUT_MS = 15000;
 const DEFAULT_TO = person.email;
 const DEFAULT_FROM = "Portfolio Inquiry <onboarding@resend.dev>";

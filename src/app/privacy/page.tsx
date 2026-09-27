@@ -5,8 +5,7 @@ import { Shell } from "@/components/Primitives";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description:
-    "What this site collects, why, who processes it, and how to have it deleted.",
+  description: "What this site collects, why, who processes it, and how to have it deleted.",
   robots: { index: true, follow: true },
 };
 
@@ -38,9 +37,7 @@ const sections = [
   },
   {
     h: "Storage on your device",
-    body: [
-      "Nothing. This site sets no cookies and writes nothing to your browser's storage.",
-    ],
+    body: ["Nothing. This site sets no cookies and writes nothing to your browser's storage."],
   },
   {
     h: "How long it is kept",
@@ -68,33 +65,26 @@ export default function PrivacyPage() {
       <section className="py-20 md:py-28">
         <Shell>
           <div className="max-w-[68ch]">
-            <p className="font-mono text-[12px] text-[var(--fg-dim)]">Last updated {updated}</p>
+            <p className="font-mono text-[12px] text-[var(--ink-3)]">Last updated {updated}</p>
 
             {sections.map((s) => (
-              <div key={s.h} className="mt-12 border-t border-[var(--line)] pt-8 first:border-t-0">
-                <h2 className="display-soft text-[1.5rem] text-[var(--fg)]">
-                  {s.h}
-                </h2>
+              <div key={s.h} className="mt-12 border-t border-[var(--rule)] pt-8 first:border-t-0">
+                <h2 className="title text-[1.5rem] text-[var(--ink)]">{s.h}</h2>
                 {s.body.map((para) => (
-                  <p
-                    key={para}
-                    className="mt-4 text-[15px] leading-[1.75] text-[var(--fg-muted)]"
-                  >
+                  <p key={para} className="mt-4 text-[15px] leading-[1.75] text-[var(--ink-2)]">
                     {para}
                   </p>
                 ))}
               </div>
             ))}
 
-            <div className="mt-12 border-t border-[var(--line)] pt-8">
-              <h2 className="display-soft text-[1.5rem] text-[var(--fg)]">
-                Contact
-              </h2>
-              <p className="mt-4 text-[15px] leading-[1.75] text-[var(--fg-muted)]">
+            <div className="mt-12 border-t border-[var(--rule)] pt-8">
+              <h2 className="title text-[1.5rem] text-[var(--ink)]">Contact</h2>
+              <p className="mt-4 text-[15px] leading-[1.75] text-[var(--ink-2)]">
                 For anything on this page, including a deletion request, email{" "}
                 <a
                   href={`mailto:${person.email}`}
-                  className="break-all text-[var(--fg)] underline decoration-[var(--line-strong)] underline-offset-4 transition-colors hover:decoration-[var(--accent)]"
+                  className="break-all text-[var(--ink)] underline decoration-[var(--rule-strong)] underline-offset-4 transition-colors hover:decoration-[var(--red)]"
                 >
                   {person.email}
                 </a>

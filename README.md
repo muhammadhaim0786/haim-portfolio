@@ -1,7 +1,7 @@
 # Muhammad Haim, portfolio
 
-Next.js App Router, Tailwind v4, Motion, self-hosted Geist and Archivo. Five
-routes, one dark theme, one accent. Static except the contact page and the
+Next.js App Router, Tailwind v4, Motion, self-hosted Geist and Bricolage
+Grotesque. Five routes, light and dark, one accent. Static except the contact page and the
 Resend inquiry route.
 
 ## Run it
@@ -67,7 +67,8 @@ components.
 | `figures` | The four numbers in the hero panel |
 | `bio` | The About page paragraphs |
 | `roles` | Experience on `/about`. First 3 render in full, the rest compact. Change `DETAILED` in `Experience.tsx`. |
-| `work` | Case studies. Entry 0 is the feature cell. |
+| `work` | Case studies, each with a `before` (struck through) and `after` line. |
+| `builds` | Apps built with AI: status, what it does, how AI was used, stack, optional `href` and `image`. |
 | `capabilities` | The bento grid. It tiles a 6x3 grid exactly, so adjust `placement` in `Capabilities.tsx` if you add or remove one. |
 | `method` | The horizontal scroll row |
 | `paths` | The three engagement cards on `/contact` |
@@ -80,18 +81,27 @@ Replacing the CV: drop the new PDF in `public/` and update `person.cv` and
 
 ## Design decisions worth knowing before you edit
 
-- **One dark theme.** Near-black background, one acid-lime accent (`--accent`) and
-  one olive glow (`--glow`), all defined in `globals.css`. There is no light mode.
-- **Display type** is Archivo variable at weight 900 and width 125%, self-hosted
-  from `@fontsource-variable/archivo` via `next/font/local`. Body stays Geist.
-- **Shape rule.** Buttons and chips are full pills, cards use `--r-card` (22px),
-  inputs use `--r-input` (14px).
-- **Motion**: hero headline mask reveal and pointer-following glow (Motion values,
-  no React state), count-up figures, sticky stacking work cards (Motion
-  `useScroll`), spotlight card borders (CSS variables), CSS scroll-driven reveals.
-  Everything collapses to static under `prefers-reduced-motion`.
-- **Only one marquee** (the toolchain rail).
-- **WhatsApp** is a floating button on every page plus a row in every contact block.
+The concept is **Redline**: the site reads like a document a reviewer has
+checked. That is the job, so it is the design.
+
+- **Paper, ink, one red.** Tokens live in `globals.css` (`--paper`, `--ink`,
+  `--red`). Red is only for pen marks, margin notes, and the primary action's
+  offset shadow. Light and dark are both token sets picked from
+  `prefers-color-scheme`.
+- **Pen marks** (`Mark.tsx`): circle, underline, and scribble strokes drawn over
+  real text with Motion `pathLength`. `Strike.tsx` draws a strikethrough that
+  follows wrapped lines. `Check` ticks the capability checklist.
+- **Margin notes** (`Note.tsx`): short mono red comments, real content only.
+- **Type**: Bricolage Grotesque variable for headlines (self-hosted via
+  `@fontsource-variable/bricolage-grotesque`), Geist for body, Geist Mono for notes.
+- **Shape rule**: every radius is `--r` (8px).
+- **Only one marquee** (the toolchain logos).
+- **Builds section** (`Builds.tsx`, data in `builds` in `resume.ts`) shows the apps
+  built with AI. Covers are illustrative images generated with Higgsfield, not
+  screenshots; they are hotlinked from Higgsfield's CDN (allowed in
+  `next.config.ts`). Download them into `public/builds/` and switch to local
+  paths so they never expire. Add real screenshots when you have them.
+- Motion collapses to static under `prefers-reduced-motion`.
 
 ## Verified
 
@@ -105,5 +115,5 @@ jumping to the bottom of the page.
 - Next.js App Router
 - Tailwind v4 with CSS custom properties as the token layer
 - `geist` for self-hosted Geist Sans and Geist Mono, no Google Fonts request
-- `motion` for the hero, figures, and work stack
+- `motion` for the pen marks, hero entry, and figure count-ups
 - `@phosphor-icons/react` for icons, `simple-icons` for brand marks

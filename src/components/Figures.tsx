@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { figures } from "@/content/resume";
+import { Shell } from "./Primitives";
 
 /** Counts up once when it enters view. Prefix/suffix are kept verbatim. */
 function Count({ value }: { value: string }) {
@@ -27,22 +28,28 @@ function Count({ value }: { value: string }) {
   return <span ref={ref}>{value}</span>;
 }
 
+/** Four numbers from the CV, set like the totals row of a test report. */
 export function Figures() {
   return (
-    <section aria-label="Numbers from the CV" className="relative">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-px overflow-hidden border-y border-[var(--line)] bg-[var(--line)] lg:grid-cols-4">
-        {figures.map((f) => (
-          <div key={f.label} className="bg-[var(--bg)] px-5 py-9 sm:px-8 md:py-12">
-            <p className="display text-[clamp(2.4rem,5.2vw,4.4rem)] text-[var(--fg)]">
-              <Count value={f.value} />
-            </p>
-            <p className="mt-3 font-mono text-[11.5px] text-[var(--accent)]">{f.unit}</p>
-            <p className="mt-1.5 max-w-[24ch] text-[13.5px] leading-snug text-[var(--fg-muted)]">
-              {f.label}
-            </p>
-          </div>
-        ))}
-      </div>
+    <section aria-label="Numbers from the CV" className="border-y border-[var(--rule)]">
+      <Shell>
+        <dl className="grid grid-cols-2 lg:grid-cols-4">
+          {figures.map((f, i) => (
+            <div
+              key={f.label}
+              className={`py-9 md:py-11 ${i % 2 === 1 ? "pl-5 sm:pl-8" : "pr-5"} ${
+                i > 0 ? "lg:border-l lg:border-[var(--rule)] lg:pl-8" : ""
+              } ${i < 2 ? "border-b border-[var(--rule)] lg:border-b-0" : ""} ${i % 2 === 1 ? "border-l border-[var(--rule)]" : ""}`}
+            >
+              <dd className="display text-[clamp(2.4rem,4.6vw,3.8rem)] text-[var(--ink)]">
+                <Count value={f.value} />
+              </dd>
+              <dd className="note mt-2">{f.unit}</dd>
+              <dt className="mt-1.5 max-w-[24ch] text-[14px] leading-snug text-[var(--ink-2)]">{f.label}</dt>
+            </div>
+          ))}
+        </dl>
+      </Shell>
     </section>
   );
 }

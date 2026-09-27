@@ -1,37 +1,40 @@
 import type { ReactNode } from "react";
+import { Mark } from "./Mark";
 import { Shell } from "./Primitives";
 
 /**
- * Inner-page header. States what the page is in display type and gets out
- * of the way. Top padding clears the floating nav.
+ * Inner-page header. States what the page is; one phrase gets the reviewer's
+ * underline so every page carries the same hand.
  */
 export function PageHeader({
   title,
-  accent,
+  marked,
   lede,
   aside,
 }: {
   title: string;
-  accent?: string;
+  marked?: string;
   lede: string;
   aside?: ReactNode;
 }) {
   return (
-    <section className="relative isolate overflow-hidden border-b border-[var(--line)]">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10"
-        style={{ background: "radial-gradient(55% 80% at 80% 0%, var(--glow), transparent 70%)" }}
-      />
-      <Shell className="pb-16 pt-36 md:pb-24 md:pt-44">
-        <h1 className="display glow-text max-w-[14ch] text-[clamp(2.8rem,8vw,7rem)] text-[var(--fg)]">
+    <section className="relative isolate overflow-hidden border-b border-[var(--rule)]">
+      <div aria-hidden className="ruled absolute inset-0 -z-10 opacity-60" />
+      <Shell className="pb-16 pt-16 md:pb-24 md:pt-24">
+        <h1 className="display max-w-[16ch] text-[clamp(2.6rem,6.4vw,5.6rem)] text-[var(--ink)]">
           {title}
-          {accent ? <span className="text-[var(--accent)]"> {accent}</span> : null}
+          {marked ? (
+            <>
+              {" "}
+              <Mark kind="underline" delay={0.4}>
+                {marked}
+              </Mark>
+            </>
+          ) : null}
         </h1>
-        <p className="mt-8 max-w-[56ch] text-[16.5px] leading-relaxed text-[var(--fg-muted)]">{lede}</p>
+        <p className="mt-8 max-w-[56ch] text-[17px] leading-relaxed text-[var(--ink-2)]">{lede}</p>
         {aside ? <div className="mt-9">{aside}</div> : null}
       </Shell>
-      <div id="top-sentinel" className="absolute left-0 top-2 h-px w-px" aria-hidden />
     </section>
   );
 }

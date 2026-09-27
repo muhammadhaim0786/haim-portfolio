@@ -18,10 +18,11 @@ const pages = [
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-[var(--line)] pt-16">
-      <Shell className="grid gap-10 pb-10 md:grid-cols-12">
+    <footer className="border-t border-[var(--rule)] bg-[var(--paper-2)] py-14 pb-28 sm:pb-14">
+      <Shell className="grid gap-10 md:grid-cols-12">
         <div className="md:col-span-6">
-          <p className="max-w-[36ch] text-[14.5px] leading-relaxed text-[var(--fg-muted)]">
+          <p className="title text-[22px] text-[var(--ink)]">{person.name}</p>
+          <p className="mt-2 max-w-[38ch] text-[14.5px] leading-relaxed text-[var(--ink-2)]">
             {person.discipline}. Based in {person.location}, working with teams anywhere.
           </p>
           <div className="mt-6 flex gap-2">
@@ -30,7 +31,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="WhatsApp"
-              className="icon-btn !size-11"
+              className="icon-btn"
             >
               <WhatsappLogoIcon size={18} />
             </a>
@@ -39,37 +40,34 @@ export function Footer() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="LinkedIn"
-              className="icon-btn !size-11"
+              className="icon-btn"
             >
               <LinkedinLogoIcon size={18} />
             </a>
-            <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn !size-11">
+            <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn">
               <EnvelopeSimpleIcon size={18} />
             </a>
-            <a href={person.cv} download={person.cvName} aria-label="Download CV" className="icon-btn !size-11">
+            <a href={person.cv} download={person.cvName} aria-label="Download CV" className="icon-btn">
               <DownloadSimpleIcon size={18} />
             </a>
           </div>
         </div>
 
-        <nav aria-label="Footer pages" className="flex flex-wrap gap-x-7 gap-y-3 md:col-span-6 md:justify-end md:self-end">
+        <nav
+          aria-label="Footer pages"
+          className="flex flex-wrap gap-x-7 gap-y-3 md:col-span-6 md:justify-end md:self-end"
+        >
           {pages.map((p) => (
             <Link
               key={p.href}
               href={p.href}
-              className="text-[14px] text-[var(--fg-muted)] transition-colors hover:text-[var(--accent)]"
+              className="redlink text-[14px] text-[var(--ink-2)] hover:text-[var(--ink)]"
             >
               {p.label}
             </Link>
           ))}
         </nav>
       </Shell>
-
-      <div aria-hidden className="select-none px-3">
-        <p className="display translate-y-[16%] whitespace-nowrap text-center text-[24vw] leading-[0.8] text-transparent [-webkit-text-stroke:1px_rgb(238_241_232_/_0.16)]">
-          Haim<span className="text-[var(--accent)] [-webkit-text-stroke:0]">.</span>
-        </p>
-      </div>
     </footer>
   );
 }

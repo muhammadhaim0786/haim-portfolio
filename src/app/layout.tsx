@@ -8,14 +8,14 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import "./globals.css";
 
-/* Archivo variable, width axis included, self-hosted from @fontsource.
-   Used only for display headlines at weight 800-900, width 112-125%. */
+/* Bricolage Grotesque variable (weight, width, optical size), self-hosted
+   from @fontsource-variable. Headlines only; body and notes stay Geist. */
 const display = localFont({
-  src: "../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2",
+  src: "../../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-standard-normal.woff2",
   variable: "--font-display",
-  weight: "100 900",
+  weight: "200 800",
+  declarations: [{ prop: "font-stretch", value: "75% 100%" }],
   display: "swap",
-  declarations: [{ prop: "font-stretch", value: "62% 125%" }],
 });
 
 const description =
@@ -58,19 +58,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070807",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f1f2ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#111315" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} ${display.variable} antialiased`}
-      >
+      <body className={`${GeistSans.variable} ${GeistMono.variable} ${display.variable} antialiased`}>
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-[14px] focus:font-medium focus:text-[var(--accent-fg)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-[var(--r)] focus:bg-[var(--ink)] focus:px-4 focus:py-2 focus:text-[14px] focus:font-medium focus:text-[var(--paper)]"
         >
           Skip to content
         </a>
@@ -78,7 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
         <Footer />
         <WhatsAppFloat />
-        <div aria-hidden className="grain" />
       </body>
     </html>
   );

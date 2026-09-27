@@ -2,163 +2,128 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import {
-  ArrowUpRightIcon,
   DownloadSimpleIcon,
   EnvelopeSimpleIcon,
   LinkedinLogoIcon,
   WhatsappLogoIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { person } from "@/content/resume";
+import { Mark } from "./Mark";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
- * Kinetic poster hero. Three headline lines rise out of a clip mask in
- * sequence (establishes reading order), then everything stops. The olive
- * glow tracks the pointer through motion values, never React state.
+ * Split hero. Left: the claim, typeset plainly, then marked up by the
+ * reviewer in sequence (circle, underline, margin note). Right: the person,
+ * presented as the exhibit, stamped. Motion tells the story once and stops.
  */
 export function Hero() {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
-  const mx = useMotionValue(50);
-  const my = useMotionValue(30);
-  const sx = useSpring(mx, { stiffness: 60, damping: 20 });
-  const sy = useSpring(my, { stiffness: 60, damping: 20 });
-  const glow = useMotionTemplate`radial-gradient(48% 55% at ${sx}% ${sy}%, var(--glow), transparent 70%)`;
-
-  function onMove(e: React.PointerEvent) {
-    if (reduce || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    mx.set(((e.clientX - r.left) / r.width) * 100);
-    my.set(((e.clientY - r.top) / r.height) * 100);
-  }
-
-  const line = (i: number) => ({
-    initial: reduce ? false : { y: "105%" },
-    animate: { y: "0%" },
-    transition: { duration: 1, delay: 0.1 + i * 0.09, ease },
-  });
-  const rise = (i: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 18 },
+  const rise = (d: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, delay: 0.45 + i * 0.08, ease },
+    transition: { duration: 0.7, delay: d, ease },
   });
 
   return (
-    <section
-      ref={ref}
-      id="top"
-      onPointerMove={onMove}
-      className="relative isolate flex min-h-[100dvh] flex-col overflow-hidden"
-    >
-      <motion.div aria-hidden className="absolute inset-0 -z-10" style={{ background: glow }} />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-[var(--bg)]"
-      />
+    <section id="top" className="relative isolate overflow-hidden">
+      <div aria-hidden className="ruled absolute inset-0 -z-10 opacity-70" />
 
-      <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-5 pb-14 pt-28 sm:px-8 md:pt-32">
-        <motion.p {...rise(-2)} className="chip w-fit gap-2 !px-3 !py-1.5 !text-[11.5px]">
-          <span className="relative flex size-2">
-            <span className="ping absolute inset-0 rounded-full bg-[var(--accent)]" />
-            <span className="relative size-2 rounded-full bg-[var(--accent)]" />
-          </span>
-          {person.available}
-        </motion.p>
-
-        <div className="relative">
-          <h1 className="display glow-text mt-7 text-[clamp(2.9rem,8.2vw,8.6rem)] text-[var(--fg)]">
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span {...line(0)} className="block">
-                I find the
-              </motion.span>
-            </span>
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span {...line(1)} className="block text-[var(--accent)]">
-                defects
-              </motion.span>
-            </span>
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span {...line(2)} className="block">
-                your UI hides<span className="text-[var(--accent)]">.</span>
-              </motion.span>
-            </span>
-          </h1>
-          <motion.figure
-            {...rise(2)}
-            className="absolute right-0 top-2 hidden w-[340px] items-center gap-5 xl:flex"
+      <div className="mx-auto grid w-full max-w-[1280px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 md:pb-28 md:pt-20 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-12 lg:py-16">
+        <div className="lg:col-span-8">
+          <motion.h1
+            {...rise(0)}
+            className="display max-w-[17ch] text-[clamp(2.6rem,5.4vw,5.1rem)] text-[var(--ink)]"
           >
-            <div className="relative">
-              <div
-                aria-hidden
-                className="absolute -inset-3 -z-10 rounded-[28px] bg-[var(--accent)] opacity-20 blur-2xl"
-              />
-              <Image
-                src="/haim.jpg"
-                alt={`${person.name}, ${person.role}`}
-                width={400}
-                height={400}
-                priority
-                sizes="144px"
-                className="size-36 -rotate-3 rounded-[var(--r-card)] border border-[var(--line-strong)] object-cover grayscale-[35%] transition-[transform,filter] duration-500 hover:rotate-0 hover:grayscale-0"
-              />
-            </div>
-            <figcaption>
-              <p className="display-soft text-[20px] text-[var(--fg)]">{person.name}</p>
-              <p className="mt-1.5 text-[13.5px] text-[var(--fg-muted)]">{person.discipline}</p>
-              <p className="mt-1 font-mono text-[11.5px] text-[var(--fg-dim)]">{person.location}</p>
-            </figcaption>
-          </motion.figure>
-        </div>
+            Every release has a{" "}
+            <Mark kind="circle" delay={0.55}>
+              bug.
+            </Mark>{" "}
+            I find it{" "}
+            <Mark kind="underline" delay={1.35}>
+              before your users
+            </Mark>{" "}
+            do.
+          </motion.h1>
 
-        <div className="mt-10">
-          <div>
-            <motion.p
-              {...rise(0)}
-              className="max-w-[46ch] text-[16px] leading-relaxed text-[var(--fg-muted)] sm:text-[17px]"
+          <motion.p {...rise(1.9)} className="note mt-5 flex items-center gap-2 text-[12.5px]">
+            <span aria-hidden className="h-px w-8 bg-[var(--red)]" />
+            UI, API, database, logs. Defects get checked where the truth lives.
+          </motion.p>
+
+          <motion.p
+            {...rise(0.15)}
+            className="mt-9 max-w-[50ch] text-[17px] leading-relaxed text-[var(--ink-2)]"
+          >
+            {person.subline}
+          </motion.p>
+
+          <motion.div {...rise(0.25)} className="mt-9 flex flex-wrap items-center gap-3">
+            <Link href="/contact" className="btn btn-ink">
+              Get in touch
+            </Link>
+            <a href={person.cv} download={person.cvName} className="btn btn-line">
+              <DownloadSimpleIcon size={16} />
+              Download CV
+            </a>
+            <span aria-hidden className="mx-1 hidden h-6 w-px bg-[var(--rule-strong)] sm:block" />
+            <a
+              href={person.whatsapp}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="WhatsApp"
+              className="icon-btn"
             >
-              {person.subline}
-            </motion.p>
-
-            <motion.div {...rise(1)} className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/contact" className="btn btn-primary">
-                Get in touch
-                <ArrowUpRightIcon size={14} weight="bold" />
-              </Link>
-              <a href={person.cv} download={person.cvName} className="btn btn-ghost">
-                <DownloadSimpleIcon size={16} />
-                Download CV
-              </a>
-              <span aria-hidden className="mx-1 hidden h-6 w-px bg-[var(--line-strong)] sm:block" />
-              <a
-                href={person.whatsapp}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="WhatsApp"
-                className="icon-btn"
-              >
-                <WhatsappLogoIcon size={19} />
-              </a>
-              <a
-                href={person.linkedin}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="LinkedIn"
-                className="icon-btn"
-              >
-                <LinkedinLogoIcon size={19} />
-              </a>
-              <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn">
-                <EnvelopeSimpleIcon size={19} />
-              </a>
-            </motion.div>
-          </div>
+              <WhatsappLogoIcon size={19} />
+            </a>
+            <a
+              href={person.linkedin}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="LinkedIn"
+              className="icon-btn"
+            >
+              <LinkedinLogoIcon size={19} />
+            </a>
+            <a href={`mailto:${person.email}`} aria-label="Email" className="icon-btn">
+              <EnvelopeSimpleIcon size={19} />
+            </a>
+          </motion.div>
         </div>
+
+        <motion.figure
+          {...rise(0.35)}
+          className="relative mx-auto w-full max-w-[340px] lg:col-span-4 lg:mx-0 lg:justify-self-end"
+        >
+          <div className="sheet rotate-[1.5deg] p-3 pb-4 shadow-[0_30px_60px_-35px_rgb(19_21_24_/_0.45)] transition-transform duration-500 hover:rotate-0">
+            <Image
+              src="/haim.jpg"
+              alt={`${person.name}, ${person.role}`}
+              width={400}
+              height={400}
+              priority
+              sizes="(min-width: 1024px) 320px, 90vw"
+              className="aspect-square w-full rounded-[calc(var(--r)-3px)] object-cover"
+            />
+            <figcaption className="mt-4 px-1">
+              <p className="title text-[19px] text-[var(--ink)]">{person.name}</p>
+              <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">{person.discipline}</p>
+              <p className="mt-0.5 font-mono text-[11.5px] text-[var(--ink-3)]">{person.location}</p>
+            </figcaption>
+          </div>
+          <motion.span
+            initial={reduce ? false : { opacity: 0, scale: 1.6, rotate: -18 }}
+            animate={{ opacity: 1, scale: 1, rotate: -12 }}
+            transition={{ duration: 0.35, delay: 2.1, ease: [0.2, 1.4, 0.4, 1] }}
+            className="stamp absolute -left-6 top-6 bg-[var(--sheet)] text-[15px] sm:-left-10"
+          >
+            Open to work
+            <span className="text-[9.5px] tracking-[0.14em]">QA roles and contracts</span>
+          </motion.span>
+        </motion.figure>
       </div>
-      <div id="top-sentinel" className="absolute left-0 top-2 h-px w-px" aria-hidden />
     </section>
   );
 }

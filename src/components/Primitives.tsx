@@ -1,13 +1,10 @@
 import type { ReactNode } from "react";
 
 export function Shell({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-[1320px] px-5 sm:px-8 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-[1280px] px-5 sm:px-8 ${className}`}>{children}</div>;
 }
 
-/**
- * Section headings are set in the expanded display face. No eyebrow label:
- * the section's position on the page already says what it is.
- */
+/** Section headings: sentence case, display face, no eyebrow label. */
 export function SectionHeading({
   id,
   children,
@@ -20,7 +17,7 @@ export function SectionHeading({
   return (
     <h2
       id={id}
-      className={`display scroll-mt-28 text-[clamp(2.2rem,5.6vw,4.6rem)] text-[var(--fg)] ${className}`}
+      className={`display scroll-mt-24 text-[clamp(2.2rem,4.8vw,4rem)] text-[var(--ink)] ${className}`}
     >
       {children}
     </h2>
